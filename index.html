@@ -1,546 +1,603 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="scroll-smooth">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Decide Vivir UTN - Prevención de Drogas en Jóvenes</title>
-  
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            royal: {
-              DEFAULT: '#4169E1',
-              dark: '#1E3A8A',
-              light: '#60A5FA',
-              soft: '#EFF6FF'
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prevención del Consumo de Drogas - UTN</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#3b82f6',
+                            600: '#1d4ed8', // Azul Rey
+                            700: '#1e40af',
+                            800: '#1e3a8a',
+                            900: '#1e1b4b',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
             }
-          }
         }
-      }
-    }
-  </script>
+    </script>
 
-  <!-- Font Awesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
-  <!-- Leaflet CSS (Mapa interactivo) -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <style>
-    /* Custom style overrides for canvas map height and smooth modal fade */
-    #map { height: 380px; width: 100%; border-radius: 0.75rem; z-index: 10; }
-    .modal-active { display: flex !important; }
-    @keyframes modalPop {
-      from { transform: scale(0.9); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
-    }
-    .modal-anim { animation: modalPop 0.25s ease-out forwards; }
-  </style>
+    <!-- Leaflet CSS for Maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .bg-pattern {
+            background-color: #ffffff;
+            background-image: radial-gradient(#1d4ed8 0.5px, transparent 0.5px), radial-gradient(#1d4ed8 0.5px, #ffffff 0.5px);
+            background-size: 20px 20px;
+            background-position: 0 0,10px 10px;
+            background-opacity: 0.05;
+        }
+        .chat-scroll::-webkit-scrollbar {
+            width: 5px;
+        }
+        .chat-scroll::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 10px;
+        }
+    </style>
 </head>
-<body class="bg-slate-50 text-slate-800 flex flex-col min-h-screen">
+<body class="bg-slate-50 text-slate-800 flex flex-col min-h-screen relative antialiased">
 
-  <!-- BARRA DE NAVEGACIÓN -->
-  <header class="bg-royal-dark text-white sticky top-0 z-40 shadow-md">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-      <a href="#" class="flex items-center gap-3 text-xl font-bold hover:opacity-90 transition-opacity">
-        <div class="bg-royal-light/20 p-2 rounded-lg text-royal-light">
-          <i class="fa-solid fa-hand-holding-heart text-2xl"></i>
-        </div>
-        <span>Decide Vivir <span class="text-royal-light">UTN</span></span>
-      </a>
-      <nav class="hidden md:flex gap-6 font-medium text-sm">
-        <a href="#inicio" class="hover:text-royal-light transition-colors">Inicio</a>
-        <a href="#mitos" class="hover:text-royal-light transition-colors">Mitos y Realidades</a>
-        <a href="#carrusel" class="hover:text-royal-light transition-colors">Estilo de Vida</a>
-        <a href="#flyers" class="hover:text-royal-light transition-colors">Volantes Informativos</a>
-        <a href="#ubicacion" class="hover:text-royal-light transition-colors">Ubicación UTN</a>
-      </nav>
-      <button onclick="openModal('flyer1')" class="bg-royal text-white px-4 py-2 rounded-full font-semibold text-sm hover:bg-blue-600 transition-all shadow-md flex items-center gap-2">
-        <i class="fa-solid fa-bell animate-pulse"></i> Ver Pop-Up Informativo
-      </button>
-    </div>
-  </header>
-
-  <!-- HERO BANNER -->
-  <section id="inicio" class="bg-gradient-to-r from-royal-dark to-royal text-white py-16 px-4 sm:px-6 lg:px-8 text-center relative overflow-hidden">
-    <div class="max-w-4xl mx-auto relative z-10">
-      <span class="bg-royal-light/30 text-royal-soft text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider inline-block mb-3 border border-royal-light/40">
-        Universidad Tecnológica de Nezahualcóyotl
-      </span>
-      <h1 class="text-3xl sm:text-5xl font-extrabold mb-4 leading-tight">
-        Tu Futuro Vale Más. Decide Tu Camino Libre de Drogas.
-      </h1>
-      <p class="text-lg sm:text-xl text-blue-100 mb-8 max-w-2xl mx-auto font-light">
-        Espacio de prevención, orientación psicopedagógica y acompañamiento continuo para todos los estudiantes del campus UTN.
-      </p>
-      <div class="flex flex-wrap justify-center gap-4">
-        <a href="#ubicacion" class="bg-white text-royal-dark font-bold px-6 py-3 rounded-full hover:bg-blue-50 transition-transform transform hover:-translate-y-1 shadow-lg">
-          <i class="fa-solid fa-location-dot mr-2"></i> Ir al Módulo UTN
-        </a>
-        <button onclick="openModal('flyer1')" class="bg-royal-dark border-2 border-white/80 text-white font-bold px-6 py-3 rounded-full hover:bg-white hover:text-royal-dark transition-all shadow-lg">
-          <i class="fa-solid fa-circle-info mr-2"></i> Abrir Pop-Up Informativo
-        </button>
-      </div>
-    </div>
-  </section>
-
-  <!-- MITOS Y REALIDADES -->
-  <section id="mitos" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-    <div class="text-center mb-12">
-      <h2 class="text-3xl font-bold text-royal-dark">Mitos y Realidades sobre el Consumo</h2>
-      <div class="w-16 h-1 bg-royal mx-auto mt-2 rounded-full"></div>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      <div class="bg-white p-6 rounded-xl border-l-4 border-royal shadow-sm hover:shadow-md transition-shadow">
-        <div class="text-royal text-3xl mb-4"><i class="fa-solid fa-shield-halved"></i></div>
-        <h3 class="text-xl font-bold text-royal-dark mb-2">Mito: "Solo una vez no hace daño"</h3>
-        <p class="text-slate-600 text-sm leading-relaxed">
-          Probar sustancias por presión social o curiosidad puede alterar los circuitos cerebrales de gratificación desde la primera experiencia y generar adicción.
-        </p>
-      </div>
-
-      <div class="bg-white p-6 rounded-xl border-l-4 border-royal shadow-sm hover:shadow-md transition-shadow">
-        <div class="text-royal text-3xl mb-4"><i class="fa-solid fa-brain"></i></div>
-        <h3 class="text-xl font-bold text-royal-dark mb-2">Impacto en la Salud Mental</h3>
-        <p class="text-slate-600 text-sm leading-relaxed">
-          El consumo incrementa los niveles de depresión, irritabilidad y episodios de ansiedad, interfiriendo directamente en tu desempeño escolar en la UTN.
-        </p>
-      </div>
-
-      <div class="bg-white p-6 rounded-xl border-l-4 border-royal shadow-sm hover:shadow-md transition-shadow">
-        <div class="text-royal text-3xl mb-4"><i class="fa-solid fa-people-group"></i></div>
-        <h3 class="text-xl font-bold text-royal-dark mb-2">Entorno y Red de Apoyo</h3>
-        <p class="text-slate-600 text-sm leading-relaxed">
-          Fortalecer las habilidades emocionales y entablar amistades saludables te otorgan protección sólida contra las presiones del entorno.
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <!-- CARRUSEL DE IMÁGENES -->
-  <section id="carrusel" class="bg-royal-soft py-16 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-4xl mx-auto">
-      <div class="text-center mb-8">
-        <h2 class="text-3xl font-bold text-royal-dark">Hábitos y Estilo de Vida Saludable</h2>
-        <p class="text-slate-600 text-sm mt-1">Actividades de integración disponibles dentro de la UTN</p>
-      </div>
-
-      <!-- Contenedor del Carrusel -->
-      <div class="relative overflow-hidden rounded-2xl shadow-xl bg-black group">
-        <div id="carouselTrack" class="flex transition-transform duration-500 ease-in-out">
-          
-          <!-- Slide 1 -->
-          <div class="min-w-full relative">
-            <img src="https://images.unsplash.com/photo-1517649763962-0c623266010b?auto=format&fit=crop&w=1200&q=80" alt="Deportes UTN" class="w-full h-96 object-cover opacity-90">
-            <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-6 text-white text-center">
-              <h3 class="text-xl font-bold">Talleres Deportivos y Acondicionamiento</h3>
-              <p class="text-sm text-slate-200">Canaliza el estrés académico integrándote a los equipos deportivos campus UTN.</p>
+    <!-- WELCOME POP-UP MODAL -->
+    <div id="welcomeModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-sm transition-opacity duration-300">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 md:p-8 transform transition-all duration-300 scale-100 relative border-t-4 border-brand-600">
+            <button onclick="closeWelcomeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 transition">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            <div class="flex items-center space-x-3 mb-4">
+                <div class="w-12 h-12 bg-brand-100 rounded-full flex items-center justify-center text-brand-600 font-bold text-xl">
+                    <i class="fa-solid fa-shield-heart"></i>
+                </div>
+                <div>
+                    <span class="text-xs font-semibold text-brand-600 uppercase tracking-wider">Comunidad UTN</span>
+                    <h3 class="text-xl font-bold text-slate-900">Bienvenido al Portal de Prevención</h3>
+                </div>
             </div>
-          </div>
-
-          <!-- Slide 2 -->
-          <div class="min-w-full relative">
-            <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1200&q=80" alt="Conexión Social" class="w-full h-96 object-cover opacity-90">
-            <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-6 text-white text-center">
-              <h3 class="text-xl font-bold">Círculos de Diálogo y Amistad</h3>
-              <p class="text-sm text-slate-200">Construye espacios seguros donde expresarte sin ser juzgado.</p>
-            </div>
-          </div>
-
-          <!-- Slide 3 -->
-          <div class="min-w-full relative">
-            <img src="https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=1200&q=80" alt="Arte y Cultura" class="w-full h-96 object-cover opacity-90">
-            <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-6 text-white text-center">
-              <h3 class="text-xl font-bold">Actividades Culturales y Expresión</h3>
-              <p class="text-sm text-slate-200">Desarrolla tus habilidades en música, teatro y pintura dentro de la universidad.</p>
-            </div>
-          </div>
-
-        </div>
-
-        <!-- Controles Carrusel -->
-        <button id="prevBtn" class="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-royal-dark w-10 h-10 rounded-full flex items-center justify-center shadow-md transition-all">
-          <i class="fa-solid fa-chevron-left"></i>
-        </button>
-        <button id="nextBtn" class="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-royal-dark w-10 h-10 rounded-full flex items-center justify-center shadow-md transition-all">
-          <i class="fa-solid fa-chevron-right"></i>
-        </button>
-      </div>
-    </div>
-  </section>
-
-  <!-- GALERÍA DE FLYERS Y VOLANTES (POP-UP INTERACTIVO) -->
-  <section id="flyers" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-    <div class="text-center mb-12">
-      <span class="text-royal font-semibold text-sm uppercase tracking-wider">Haz clic en cualquier volante</span>
-      <h2 class="text-3xl font-bold text-royal-dark">Volantes de Orientación Preventiva</h2>
-      <div class="w-16 h-1 bg-royal mx-auto mt-2 rounded-full"></div>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      
-      <!-- Card Flyer 1 -->
-      <div onclick="openModal('flyer1')" class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all cursor-pointer group border border-slate-200 flex flex-col">
-        <div class="relative h-64 overflow-hidden">
-          <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=600&q=80" alt="Señales de Alerta" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-          <div class="absolute inset-0 bg-royal-dark/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white p-4 text-center">
-            <i class="fa-solid fa-magnifying-glass-plus text-3xl mb-2"></i>
-            <span class="font-bold text-sm">HAGA CLIC PARA ABRIR POP-UP</span>
-          </div>
-        </div>
-        <div class="p-5 flex-1 flex flex-col justify-between">
-          <div>
-            <h3 class="font-bold text-lg text-royal-dark mb-1">Señales de Alerta y Prevención</h3>
-            <p class="text-xs text-slate-500 mb-3">Guía rápida para la identificación oportuna en el entorno escolar.</p>
-          </div>
-          <button class="w-full bg-royal-soft text-royal font-bold text-sm py-2 rounded-lg hover:bg-royal hover:text-white transition-colors flex items-center justify-center gap-2">
-            <i class="fa-solid fa-expand"></i> Ver Pop-Up Completo
-          </button>
-        </div>
-      </div>
-
-      <!-- Card Flyer 2 -->
-      <div onclick="openModal('flyer2')" class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all cursor-pointer group border border-slate-200 flex flex-col">
-        <div class="relative h-64 overflow-hidden">
-          <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=600&q=80" alt="Salud Emocional" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-          <div class="absolute inset-0 bg-royal-dark/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white p-4 text-center">
-            <i class="fa-solid fa-magnifying-glass-plus text-3xl mb-2"></i>
-            <span class="font-bold text-sm">HAGA CLIC PARA ABRIR POP-UP</span>
-          </div>
-        </div>
-        <div class="p-5 flex-1 flex flex-col justify-between">
-          <div>
-            <h3 class="font-bold text-lg text-royal-dark mb-1">Apoyo Emocional Universitario</h3>
-            <p class="text-xs text-slate-500 mb-3">Estrategias de contención frente a la ansiedad y la presión.</p>
-          </div>
-          <button class="w-full bg-royal-soft text-royal font-bold text-sm py-2 rounded-lg hover:bg-royal hover:text-white transition-colors flex items-center justify-center gap-2">
-            <i class="fa-solid fa-expand"></i> Ver Pop-Up Completo
-          </button>
-        </div>
-      </div>
-
-      <!-- Card Flyer 3 -->
-      <div onclick="openModal('flyer3')" class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all cursor-pointer group border border-slate-200 flex flex-col">
-        <div class="relative h-64 overflow-hidden">
-          <img src="https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?auto=format&fit=crop&w=600&q=80" alt="Líneas Confidenciales" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-          <div class="absolute inset-0 bg-royal-dark/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white p-4 text-center">
-            <i class="fa-solid fa-magnifying-glass-plus text-3xl mb-2"></i>
-            <span class="font-bold text-sm">HAGA CLIC PARA ABRIR POP-UP</span>
-          </div>
-        </div>
-        <div class="p-5 flex-1 flex flex-col justify-between">
-          <div>
-            <h3 class="font-bold text-lg text-royal-dark mb-1">Directorio de Atención Gratuita</h3>
-            <p class="text-xs text-slate-500 mb-3">Números de teléfono confidenciales de atención rápida 24/7.</p>
-          </div>
-          <button class="w-full bg-royal-soft text-royal font-bold text-sm py-2 rounded-lg hover:bg-royal hover:text-white transition-colors flex items-center justify-center gap-2">
-            <i class="fa-solid fa-expand"></i> Ver Pop-Up Completo
-          </button>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- UBICACIÓN EN LA UTN -->
-  <section id="ubicacion" class="bg-white py-16 border-t border-slate-200">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="text-center mb-10">
-        <h2 class="text-3xl font-bold text-royal-dark">Módulo de Orientación Presencial</h2>
-        <p class="text-slate-600 text-sm mt-1">Ubicados dentro de la Universidad Tecnológica de Nezahualcóyotl</p>
-      </div>
-
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center bg-slate-50 p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200">
-        <!-- Detalles Informativos -->
-        <div class="space-y-6">
-          <div class="flex items-start gap-4">
-            <div class="bg-royal/10 text-royal p-3 rounded-xl">
-              <i class="fa-solid fa-building-columns text-2xl"></i>
-            </div>
-            <div>
-              <h4 class="font-bold text-royal-dark text-lg">Ubicación Institucional</h4>
-              <p class="text-slate-600 text-sm mt-1">
-                Circuito Rey Nezahualcóyotl s/n, Col. Benito Juárez, C.P. 57000, Ciudad Nezahualcóyotl, Estado de México.
-              </p>
-            </div>
-          </div>
-
-          <div class="flex items-start gap-4">
-            <div class="bg-royal/10 text-royal p-3 rounded-xl">
-              <i class="fa-solid fa-clock text-2xl"></i>
-            </div>
-            <div>
-              <h4 class="font-bold text-royal-dark text-lg">Horarios de Atención</h4>
-              <p class="text-slate-600 text-sm mt-1">
-                Lunes a Viernes: 07:00 hrs a 20:00 hrs (Edificio C - Módulo de Orientación Psicopedagógica)
-              </p>
-            </div>
-          </div>
-
-          <div class="flex items-start gap-4">
-            <div class="bg-royal/10 text-royal p-3 rounded-xl">
-              <i class="fa-solid fa-phone-volume text-2xl"></i>
-            </div>
-            <div>
-              <h4 class="font-bold text-royal-dark text-lg">Contacto Confidencial</h4>
-              <p class="text-slate-600 text-sm mt-1">
-                Línea Directa Campus: (55) 5716 9700 Ext. 102<br>
-                Línea de la Vida Nacional: 800 911 2000 (Gratuita 24/7)
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Mapa Interactivo Leaflet -->
-        <div class="relative">
-          <div id="map"></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- MODAL EMERGENTE / POP-UP (VENTANA DESTACADA) -->
-  <div id="popupModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 hidden justify-center items-center p-4">
-    <div class="bg-white rounded-2xl max-w-2xl w-full overflow-hidden shadow-2xl relative modal-anim border border-slate-200">
-      
-      <!-- Botón para cerrar -->
-      <button onclick="closeModal()" class="absolute top-4 right-4 bg-slate-900/60 hover:bg-slate-900 text-white w-9 h-9 rounded-full flex items-center justify-center z-10 transition-colors">
-        <i class="fa-solid fa-xmark text-lg"></i>
-      </button>
-
-      <!-- Encabezado / Imagen del Pop-Up -->
-      <div class="relative h-64 sm:h-72">
-        <img id="modalImg" src="" alt="Volante Pop-Up Ampliado" class="w-full h-full object-cover">
-        <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent"></div>
-        <div class="absolute bottom-4 left-6 right-6 text-white">
-          <span class="bg-royal text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">Volante Preventivo</span>
-          <h3 id="modalTitle" class="text-2xl font-bold mt-1">Título del Volante</h3>
-        </div>
-      </div>
-
-      <!-- Detalle e Información Extendida -->
-      <div class="p-6">
-        <p id="modalDesc" class="text-slate-600 leading-relaxed text-sm sm:text-base mb-6">
-          Cargando detalles del volante informativo...
-        </p>
-
-        <div class="bg-royal-soft p-4 rounded-xl flex items-center justify-between border border-blue-200">
-          <div class="flex items-center gap-3">
-            <i class="fa-solid fa-headset text-royal text-2xl"></i>
-            <div>
-              <p class="font-bold text-xs text-royal-dark">¿Necesitas apoyo psicopedagógico en la UTN?</p>
-              <p class="text-xs text-slate-500">Acude directamente a nuestro módulo escolar o inicia un chat.</p>
-            </div>
-          </div>
-          <button onclick="closeModal(); toggleChat();" class="bg-royal text-white text-xs font-bold px-3 py-2 rounded-lg hover:bg-blue-600 transition-colors">
-            Hablar con Sofía
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- AVATAR Y WIDGET DE CHAT INTERACTIVO (Lic. Sofía) -->
-  <div class="fixed bottom-5 right-5 z-40">
-    <!-- Botón Flotante del Chat -->
-    <button onclick="toggleChat()" class="bg-royal hover:bg-royal-dark text-white p-3 rounded-full shadow-2xl flex items-center gap-3 border-2 border-white transition-transform hover:scale-105">
-      <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" alt="Lic. Sofía Avatar" class="w-10 h-10 rounded-full object-cover border border-white">
-      <span class="font-bold text-sm pr-2 hidden sm:inline">Lic. Sofía UTN</span>
-      <span class="relative flex h-3 w-3">
-        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-        <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
-      </span>
-    </button>
-
-    <!-- Ventana del Chat -->
-    <div id="chatWindow" class="hidden absolute bottom-16 right-0 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-slate-200 flex-col overflow-hidden">
-      <!-- Chat Header -->
-      <div class="bg-royal-dark text-white p-4 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" alt="Lic. Sofía" class="w-10 h-10 rounded-full object-cover border-2 border-white">
-          <div>
-            <h4 class="font-bold text-sm">Lic. Sofía</h4>
-            <p class="text-xs text-blue-200 flex items-center gap-1">
-              <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block"></span> Orientadora UTN
+            <p class="text-slate-600 mb-6 leading-relaxed text-sm">
+                Tu bienestar físico y emocional es prioridad en la Universidad Tecnológica de Nezahualcóyotl. Aquí encontrarás información confiable, apoyo psicológico confidencial y orientación profesional.
             </p>
-          </div>
+            <div class="bg-brand-50 p-4 rounded-xl border border-brand-100 mb-6 flex items-start space-x-3">
+                <i class="fa-solid fa-circle-info text-brand-600 mt-0.5"></i>
+                <p class="text-xs text-brand-900">
+                    <strong>¿Necesitas ayuda inmediata?</strong> Haz clic en el chat flotante de la orientadora Lic. Sofía en la esquina inferior derecha.
+                </p>
+            </div>
+            <div class="flex justify-end space-x-3">
+                <button onclick="closeWelcomeModal()" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-medium py-2.5 px-5 rounded-xl transition shadow-lg shadow-brand-600/30 text-sm">
+                    Ingresar al Sitio Web
+                </button>
+            </div>
         </div>
-        <button onclick="toggleChat()" class="text-white/80 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-      </div>
-
-      <!-- Chat Body -->
-      <div id="chatBody" class="p-4 h-72 overflow-y-auto space-y-3 bg-slate-50 text-xs sm:text-sm">
-        <div class="bg-white text-slate-800 p-3 rounded-2xl rounded-tl-none shadow-sm max-w-[85%] border border-slate-100">
-          ¡Hola! Soy Sofía, orientadora de la Universidad Tecnológica de Nezahualcóyotl. ¿En qué te puedo asesorar hoy?
-        </div>
-      </div>
-
-      <!-- Chat Input -->
-      <div class="p-3 bg-white border-t border-slate-100 flex gap-2">
-        <input type="text" id="userInput" onkeypress="handleKeyPress(event)" placeholder="Escribe tu duda aquí..." class="flex-1 bg-slate-100 text-slate-800 text-xs sm:text-sm rounded-full px-4 py-2 outline-none focus:ring-2 focus:ring-royal">
-        <button onclick="sendMessage()" class="bg-royal text-white w-9 h-9 rounded-full flex items-center justify-center hover:bg-royal-dark transition-colors">
-          <i class="fa-solid fa-paper-plane text-xs"></i>
-        </button>
-      </div>
     </div>
-  </div>
 
-  <!-- FOOTER -->
-  <footer class="bg-royal-dark text-white py-8 text-center text-xs mt-auto border-t border-royal">
-    <p>&copy; 2026 Decide Vivir UTN - Universidad Tecnológica de Nezahualcóyotl.</p>
-    <p class="text-blue-300 mt-1">Programa Institucional de Prevención y Acompañamiento Universitario.</p>
-  </footer>
+    <!-- NAVBAR -->
+    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                <!-- Logo / Brand -->
+                <div class="flex items-center space-x-3">
+                    <div class="bg-brand-600 text-white p-2.5 rounded-xl font-black text-xl shadow-md tracking-wider">
+                        UTN
+                    </div>
+                    <div>
+                        <span class="block font-bold text-slate-900 text-base md:text-lg leading-tight">Decide Vivir</span>
+                        <span class="block text-xs font-medium text-brand-600 uppercase tracking-wider">Prevención de Adicciones</span>
+                    </div>
+                </div>
 
-  <!-- Leaflet JS -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex space-x-8 text-sm font-medium text-slate-600">
+                    <a href="#inicio" class="hover:text-brand-600 transition">Inicio</a>
+                    <a href="#informacion" class="hover:text-brand-600 transition">Información</a>
+                    <a href="#folletos" class="hover:text-brand-600 transition">Volantes & Galería</a>
+                    <a href="#utn" class="hover:text-brand-600 transition">Ubicación UTN</a>
+                    <a href="#recursos" class="hover:text-brand-600 transition">Recursos</a>
+                </nav>
 
-  <script>
-    /* ==========================================================================
-       1. CARRUSEL FUNCIONAL DE IMÁGENES
-       ========================================================================== */
-    const track = document.getElementById('carouselTrack');
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
-    let index = 0;
+                <!-- Action Button -->
+                <div class="hidden md:flex">
+                    <a href="tel:8009112000" class="inline-flex items-center space-x-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-md shadow-brand-600/20 transition">
+                        <i class="fa-solid fa-phone"></i>
+                        <span>Línea de Ayuda 24/7</span>
+                    </a>
+                </div>
 
-    function updateCarousel() {
-      track.style.transform = `translateX(-${index * 100}%)`;
-    }
+                <!-- Mobile Menu Button -->
+                <button onclick="toggleMobileMenu()" class="md:hidden text-slate-600 hover:text-slate-900 focus:outline-none p-2">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
 
-    nextBtn.addEventListener('click', () => {
-      index = (index + 1) % 3;
-      updateCarousel();
-    });
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white border-b border-slate-200 px-4 pt-2 pb-4 space-y-3">
+            <a href="#inicio" onclick="toggleMobileMenu()" class="block text-sm font-medium text-slate-700 hover:text-brand-600 py-1">Inicio</a>
+            <a href="#informacion" onclick="toggleMobileMenu()" class="block text-sm font-medium text-slate-700 hover:text-brand-600 py-1">Información</a>
+            <a href="#folletos" onclick="toggleMobileMenu()" class="block text-sm font-medium text-slate-700 hover:text-brand-600 py-1">Volantes & Galería</a>
+            <a href="#utn" onclick="toggleMobileMenu()" class="block text-sm font-medium text-slate-700 hover:text-brand-600 py-1">Ubicación UTN</a>
+            <a href="#recursos" onclick="toggleMobileMenu()" class="block text-sm font-medium text-slate-700 hover:text-brand-600 py-1">Recursos</a>
+            <a href="tel:8009112000" class="block text-center bg-brand-600 text-white text-xs font-bold py-2.5 rounded-xl">Línea de Ayuda: 800 911 2000</a>
+        </div>
+    </header>
 
-    prevBtn.addEventListener('click', () => {
-      index = (index - 1 + 3) % 3;
-      updateCarousel();
-    });
+    <!-- HERO SECTION -->
+    <section id="inicio" class="relative bg-gradient-to-b from-brand-50/50 to-white py-12 md:py-20 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                
+                <!-- Left Content -->
+                <div class="space-y-6">
+                    <div class="inline-flex items-center space-x-2 bg-brand-100/80 text-brand-700 text-xs font-semibold px-3 py-1.5 rounded-full border border-brand-200">
+                        <span class="w-2 h-2 rounded-full bg-brand-600 animate-pulse"></span>
+                        <span>Comunidad Estudiantil UTN</span>
+                    </div>
+                    <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 leading-tight">
+                        Tu futuro se construye con <span class="text-brand-600">decisiones conscientes</span>
+                    </h1>
+                    <p class="text-slate-600 text-base md:text-lg leading-relaxed">
+                        Programa universitario de concienciación y prevención sobre el uso de sustancias nocivas. Espacio seguro para consultar, aprender y recibir orientación oportuna.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-3 pt-2">
+                        <button onclick="openChatWithQuestion('Hola, necesito información sobre el apoyo estudiantil')" class="inline-flex justify-center items-center space-x-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold px-6 py-3.5 rounded-xl shadow-lg shadow-brand-600/30 transition text-sm">
+                            <i class="fa-solid fa-comments"></i>
+                            <span>Hablar con Orientadora</span>
+                        </button>
+                        <a href="#informacion" class="inline-flex justify-center items-center space-x-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-6 py-3.5 rounded-xl transition text-sm">
+                            <span>Saber más</span>
+                            <i class="fa-solid fa-arrow-down"></i>
+                        </a>
+                    </div>
+                </div>
 
-    setInterval(() => {
-      index = (index + 1) % 3;
-      updateCarousel();
-    }, 5000);
+                <!-- Right Carousel Image Component -->
+                <div class="relative">
+                    <div class="relative rounded-2xl overflow-hidden shadow-2xl bg-slate-900 aspect-video md:aspect-4/3">
+                        <!-- Carousel Slides -->
+                        <div id="carouselSlides" class="relative w-full h-full">
+                            <div class="carousel-item absolute inset-0 transition-opacity duration-700 opacity-100">
+                                <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1000&q=80" alt="Estudiantes universitarios" class="w-full h-full object-cover">
+                                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent flex items-end p-6">
+                                    <p class="text-white text-sm font-medium">Unidos por un campus libre de adicciones en la UTN.</p>
+                                </div>
+                            </div>
+                            <div class="carousel-item absolute inset-0 transition-opacity duration-700 opacity-0">
+                                <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1000&q=80" alt="Orientación y salud mental" class="w-full h-full object-cover">
+                                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent flex items-end p-6">
+                                    <p class="text-white text-sm font-medium">Apoyo psicológico y escucha atenta sin prejuicios.</p>
+                                </div>
+                            </div>
+                            <div class="carousel-item absolute inset-0 transition-opacity duration-700 opacity-0">
+                                <img src="https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=1000&q=80" alt="Talleres preventivos" class="w-full h-full object-cover">
+                                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent flex items-end p-6">
+                                    <p class="text-white text-sm font-medium">Talleres interactivos y conferencias de salud.</p>
+                                </div>
+                            </div>
+                        </div>
 
-    /* ==========================================================================
-       2. MANEJO DEL POP-UP MODAL INTERACTIVO
-       ========================================================================== */
-    const flyersData = {
-      flyer1: {
-        title: "Señales de Alerta y Identificación Oportuna",
-        img: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1000&q=80",
-        desc: "Este volante detalla las principales conductas de cambio rápido, baja repentina del rendimiento académico en clases y aislamientos injustificados. Recuerda que la identificación a tiempo permite una intervención profesional efectiva."
-      },
-      flyer2: {
-        title: "Guía de Apoyo Emocional Estudiantil",
-        img: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=1000&q=80",
-        desc: "Contiene ejercicios prácticos de respiración, técnicas para lidiar con el estrés de entrega de proyectos universitarios y la importancia de no acudir a sustancias buscando vías de escape temporales."
-      },
-      flyer3: {
-        title: "Líneas Directas de Atención Gratuita 24/7",
-        img: "https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?auto=format&fit=crop&w=1000&q=80",
-        desc: "Recopilación de números institucionales y del Estado de México. Atención psicológica y de apoyo ante adicciones completamente confidencial, segura e ininterrumpida."
-      }
-    };
+                        <!-- Carousel Controls -->
+                        <button onclick="prevSlide()" class="absolute left-3 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-slate-800 w-9 h-9 rounded-full flex items-center justify-center shadow transition">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+                        <button onclick="nextSlide()" class="absolute right-3 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-slate-800 w-9 h-9 rounded-full flex items-center justify-center shadow transition">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
 
-    function openModal(flyerKey) {
-      const modal = document.getElementById('popupModal');
-      const data = flyersData[flyerKey] || flyersData['flyer1'];
-      
-      document.getElementById('modalImg').src = data.img;
-      document.getElementById('modalTitle').textContent = data.title;
-      document.getElementById('modalDesc').textContent = data.desc;
-      
-      modal.classList.add('modal-active');
-    }
+            </div>
+        </div>
+    </section>
 
-    function closeModal() {
-      const modal = document.getElementById('popupModal');
-      modal.classList.remove('modal-active');
-    }
+    <!-- INFORMACIÓN / TARJETAS -->
+    <section id="informacion" class="py-16 bg-white border-y border-slate-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto mb-12">
+                <span class="text-xs font-bold text-brand-600 uppercase tracking-widest">Información Clave</span>
+                <h2 class="text-2xl md:text-3xl font-extrabold text-slate-900 mt-1">Conocer los riesgos es el primer paso</h2>
+                <p class="text-slate-600 mt-2 text-sm">Aprende sobre los impactos del consumo de sustancias y los mitos más comunes en la juventud.</p>
+            </div>
 
-    // Cerrar si se presiona fuera del recuadro
-    document.getElementById('popupModal').addEventListener('click', (e) => {
-      if (e.target === document.getElementById('popupModal')) closeModal();
-    });
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Card 1 -->
+                <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-6 hover:shadow-xl transition duration-300 flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 bg-brand-100 text-brand-600 rounded-xl flex items-center justify-center mb-4 text-xl">
+                            <i class="fa-solid fa-brain"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-2">Salud Cerebral y Mental</h3>
+                        <p class="text-slate-600 text-xs leading-relaxed mb-4">
+                            En etapas jóvenes, el cerebro aún está en desarrollo. El consumo altera áreas clave de memoria, concentración y toma de decisiones.
+                        </p>
+                    </div>
+                    <span class="text-xs font-semibold text-brand-600 flex items-center space-x-1">
+                        <span>Prevención activa</span>
+                        <i class="fa-solid fa-circle-check"></i>
+                    </span>
+                </div>
 
-    /* ==========================================================================
-       3. MAPA INTERACTIVO DE LA UTN
-       ========================================================================== */
-    const utnLat = 19.4002;
-    const utnLng = -98.9959;
+                <!-- Card 2 -->
+                <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-6 hover:shadow-xl transition duration-300 flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 bg-brand-100 text-brand-600 rounded-xl flex items-center justify-center mb-4 text-xl">
+                            <i class="fa-solid fa-graduation-cap"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-2">Desempeño Académico</h3>
+                        <p class="text-slate-600 text-xs leading-relaxed mb-4">
+                            El uso continuo ocasiona baja en las calificaciones, ausentismo y mayor riesgo de deserción escolar en el nivel universitario.
+                        </p>
+                    </div>
+                    <span class="text-xs font-semibold text-brand-600 flex items-center space-x-1">
+                        <span>Resguardo futuro</span>
+                        <i class="fa-solid fa-circle-check"></i>
+                    </span>
+                </div>
 
-    const map = L.map('map').setView([utnLat, utnLng], 16);
+                <!-- Card 3 -->
+                <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-6 hover:shadow-xl transition duration-300 flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 bg-brand-100 text-brand-600 rounded-xl flex items-center justify-center mb-4 text-xl">
+                            <i class="fa-solid fa-people-group"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-2">Relaciones Personales</h3>
+                        <p class="text-slate-600 text-xs leading-relaxed mb-4">
+                            Afecta los lazos con amigos, familia y pareja, produciendo aislamientos, conflictos sociales y problemas de conducta.
+                        </p>
+                    </div>
+                    <span class="text-xs font-semibold text-brand-600 flex items-center space-x-1">
+                        <span>Acompañamiento</span>
+                        <i class="fa-solid fa-circle-check"></i>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap'
-    }).addTo(map);
+    <!-- VOLANTES Y GALERÍA INFOGRÁFICA -->
+    <section id="folletos" class="py-16 bg-slate-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto mb-12">
+                <span class="text-xs font-bold text-brand-600 uppercase tracking-widest">Material Gráfico</span>
+                <h2 class="text-2xl md:text-3xl font-extrabold text-slate-900 mt-1">Volantes Informativos & Infografías</h2>
+                <p class="text-slate-600 mt-2 text-sm">Haz clic en cualquier imagen para verla en tamaño completo e informarte en detalle.</p>
+            </div>
 
-    L.marker([utnLat, utnLng]).addTo(map)
-      .bindPopup('<b>Módulo de Orientación UTN</b><br>Edificio de Atenciones Psicopedagógicas')
-      .openPopup();
+            <!-- Gallery Grid -->
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                
+                <!-- Flyer 1 -->
+                <div onclick="openFlyerModal('https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=800&q=80', 'Mitos y Realidades del Consumo', 'Información sobre creencias falsas y verdades científicas de las adicciones.')" class="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200 hover:shadow-md transition cursor-pointer group">
+                    <div class="relative aspect-4/3 overflow-hidden bg-slate-100">
+                        <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=800&q=80" alt="Flyer 1" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <div class="absolute inset-0 bg-brand-900/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white">
+                            <i class="fa-solid fa-magnifying-glass-plus text-3xl"></i>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <span class="text-[10px] font-bold text-brand-600 uppercase tracking-wider">Folleto Digital</span>
+                        <h3 class="font-bold text-slate-900 text-sm mt-1">Mitos y Realidades del Consumo</h3>
+                    </div>
+                </div>
 
-    /* ==========================================================================
-       4. AVATAR Y ASISTENTE VIRTUAL (Lic. Sofía)
-       ========================================================================== */
-    function toggleChat() {
-      const chatWin = document.getElementById('chatWindow');
-      if (chatWin.classList.contains('hidden')) {
-        chatWin.classList.remove('hidden');
-        chatWin.classList.add('flex');
-      } else {
-        chatWin.classList.remove('flex');
-        chatWin.classList.add('hidden');
-      }
-    }
+                <!-- Flyer 2 -->
+                <div onclick="openFlyerModal('https://images.unsplash.com/photo-1505751172876-fa1923c5c528?auto=format&fit=crop&w=800&q=80', 'Señales de Alerta Preventiva', 'Aprende a reconocer cuando un amigo o compañero necesita ayuda profesional.')" class="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200 hover:shadow-md transition cursor-pointer group">
+                    <div class="relative aspect-4/3 overflow-hidden bg-slate-100">
+                        <img src="https://images.unsplash.com/photo-1505751172876-fa1923c5c528?auto=format&fit=crop&w=800&q=80" alt="Flyer 2" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <div class="absolute inset-0 bg-brand-900/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white">
+                            <i class="fa-solid fa-magnifying-glass-plus text-3xl"></i>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <span class="text-[10px] font-bold text-brand-600 uppercase tracking-wider">Infografía UTN</span>
+                        <h3 class="font-bold text-slate-900 text-sm mt-1">Señales de Alerta Temprana</h3>
+                    </div>
+                </div>
 
-    function handleKeyPress(e) {
-      if (e.key === 'Enter') sendMessage();
-    }
+                <!-- Flyer 3 -->
+                <div onclick="openFlyerModal('https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?auto=format&fit=crop&w=800&q=80', 'Ruta de Atención Estudiantil UTN', 'Pasos para solicitar orientación psicológica confidencial en el campus.')" class="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200 hover:shadow-md transition cursor-pointer group">
+                    <div class="relative aspect-4/3 overflow-hidden bg-slate-100">
+                        <img src="https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?auto=format&fit=crop&w=800&q=80" alt="Flyer 3" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <div class="absolute inset-0 bg-brand-900/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white">
+                            <i class="fa-solid fa-magnifying-glass-plus text-3xl"></i>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <span class="text-[10px] font-bold text-brand-600 uppercase tracking-wider">Guía de Apoyo</span>
+                        <h3 class="font-bold text-slate-900 text-sm mt-1">Ruta de Atención Psicológica</h3>
+                    </div>
+                </div>
 
-    function sendMessage() {
-      const input = document.getElementById('userInput');
-      const text = input.value.trim();
-      if (!text) return;
+            </div>
+        </div>
+    </section>
 
-      const chatBody = document.getElementById('chatBody');
+    <!-- FLYER MODAL -->
+    <div id="flyerModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl max-w-2xl w-full overflow-hidden shadow-2xl relative">
+            <button onclick="closeFlyerModal()" class="absolute top-3 right-3 bg-white/80 hover:bg-white text-slate-800 w-8 h-8 rounded-full flex items-center justify-center shadow transition z-10">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="max-h-[70vh] bg-slate-900 overflow-hidden flex items-center justify-center">
+                <img id="modalFlyerImg" src="" alt="Volante ampliado" class="max-h-[70vh] object-contain w-full">
+            </div>
+            <div class="p-5">
+                <h3 id="modalFlyerTitle" class="font-bold text-slate-900 text-lg"></h3>
+                <p id="modalFlyerDesc" class="text-slate-600 text-xs mt-1"></p>
+            </div>
+        </div>
+    </div>
 
-      // Pregunta Usuario
-      const uMsg = document.createElement('div');
-      uMsg.className = 'bg-royal text-white p-3 rounded-2xl rounded-tr-none shadow-sm max-w-[85%] ml-auto text-right';
-      uMsg.textContent = text;
-      chatBody.appendChild(uMsg);
+    <!-- UBICACIÓN UTN Y MAPA -->
+    <section id="utn" class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-3 gap-8 items-center">
+                
+                <div class="space-y-4 lg:col-span-1">
+                    <span class="text-xs font-bold text-brand-600 uppercase tracking-widest">Atención Presencial</span>
+                    <h2 class="text-2xl font-extrabold text-slate-900">Ubicación Campus UTN</h2>
+                    <p class="text-slate-600 text-sm leading-relaxed">
+                        Visítanos en el Departamento de Servicios Estudiantiles y Orientación Educativa dentro de la Universidad Tecnológica de Nezahualcóyotl.
+                    </p>
+                    <div class="space-y-3 pt-2 text-xs text-slate-700">
+                        <div class="flex items-start space-x-3">
+                            <i class="fa-solid fa-location-dot text-brand-600 text-base mt-0.5"></i>
+                            <span>Circuito Universidad Tecnológica s/n, Col. Benito Juárez, Nezahualcóyotl, Estado de México.</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <i class="fa-solid fa-clock text-brand-600 text-base"></i>
+                            <span>Lunes a Viernes: 08:00 hrs - 18:00 hrs</span>
+                        </div>
+                    </div>
+                </div>
 
-      input.value = '';
-      chatBody.scrollTop = chatBody.scrollHeight;
+                <!-- Leaflet Interactive Map -->
+                <div class="lg:col-span-2 rounded-2xl overflow-hidden border border-slate-200 shadow-md h-80 relative z-10" id="utnMap">
+                </div>
 
-      // Respuesta Asistente
-      setTimeout(() => {
-        const bMsg = document.createElement('div');
-        bMsg.className = 'bg-white text-slate-800 p-3 rounded-2xl rounded-tl-none shadow-sm max-w-[85%] border border-slate-100';
-        bMsg.textContent = getBotResponse(text);
-        chatBody.appendChild(bMsg);
-        chatBody.scrollTop = chatBody.scrollHeight;
-      }, 600);
-    }
+            </div>
+        </div>
+    </section>
 
-    function getBotResponse(input) {
-      const msg = input.toLowerCase();
-      if (msg.includes('hola') || msg.includes('buenas')) {
-        return "¡Hola! Un gusto saludarte. ¿En qué te puedo asesorar referente al módulo de la UTN o las áreas de apoyo?";
-      } else if (msg.includes('donde') || msg.includes('ubicacion') || msg.includes('llegar') || msg.includes('utn')) {
-        return "Estamos ubicados dentro de la UTN en Nezahualcóyotl, exactamente en el área de Servicios Estudiantiles.";
-      } else if (msg.includes('popup') || msg.includes('volante') || msg.includes('flyer')) {
-        return "Puedes hacer clic en cualquiera de las 3 tarjetas de la sección 'Volantes Informativos' o en el botón superior para ver el Pop-Up emergente.";
-      } else {
-        return "Recuerda que cuentas con atención totalmente confidencial en el campus UTN o puedes llamar al 800 911 2000.";
-      }
-    }
-  </script>
+    <!-- HUMAN FLOATING CHAT WIDGET (Lic. Sofía) -->
+    <div class="fixed bottom-5 right-5 z-50">
+        
+        <!-- Chat Toggle Button -->
+        <button onclick="toggleChatWindow()" class="group bg-brand-600 hover:bg-brand-700 text-white rounded-full p-2.5 shadow-2xl flex items-center space-x-3 transition transform hover:scale-105 border-2 border-white">
+            <div class="relative w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow">
+                <!-- Human Avatar Image -->
+                <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&q=80" alt="Lic. Sofía Avatar" class="w-full h-full object-cover">
+                <span class="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-white rounded-full"></span>
+            </div>
+            <div class="text-left pr-3 hidden sm:block">
+                <span class="block text-xs font-bold leading-tight">Lic. Sofía</span>
+                <span class="block text-[10px] text-brand-100">Orientadora UTN</span>
+            </div>
+        </button>
+
+        <!-- Chat Window -->
+        <div id="chatWindow" class="hidden absolute bottom-16 right-0 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col h-[480px] transition-all">
+            
+            <!-- Chat Header -->
+            <div class="bg-brand-600 text-white p-4 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="relative w-10 h-10 rounded-full overflow-hidden border border-white/50">
+                        <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&q=80" alt="Lic. Sofía" class="w-full h-full object-cover">
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-sm leading-tight">Lic. Sofía Martínez</h4>
+                        <span class="text-[11px] text-brand-100 flex items-center space-x-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                            <span>En línea para ayudarte</span>
+                        </span>
+                    </div>
+                </div>
+                <button onclick="toggleChatWindow()" class="text-white/80 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Chat Messages Area -->
+            <div id="chatMessages" class="flex-1 p-4 overflow-y-auto space-y-3 text-xs chat-scroll bg-slate-50">
+                <div class="flex items-start space-x-2">
+                    <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&q=80" class="w-7 h-7 rounded-full object-cover mt-1">
+                    <div class="bg-white border border-slate-200 rounded-2xl rounded-tl-none p-3 shadow-sm text-slate-700 max-w-[80%]">
+                        ¡Hola! Soy la Lic. Sofía, orientadora educativa de la UTN. ¿En qué te puedo apoyar hoy de manera confidencial?
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Questions -->
+            <div class="p-2 bg-white border-t border-slate-100 flex space-x-2 overflow-x-auto text-[11px]">
+                <button onclick="sendQuickMessage('¿Dónde está el cubículo de orientación?')" class="bg-slate-100 hover:bg-brand-50 hover:text-brand-600 text-slate-600 px-2.5 py-1 rounded-full whitespace-nowrap transition">
+                    📍 UBICACIÓN CUBÍCULO
+                </button>
+                <button onclick="sendQuickMessage('¿Es confidencial el apoyo?')" class="bg-slate-100 hover:bg-brand-50 hover:text-brand-600 text-slate-600 px-2.5 py-1 rounded-full whitespace-nowrap transition">
+                    🔒 CONFIDENCIALIDAD
+                </button>
+            </div>
+
+            <!-- Chat Input -->
+            <div class="p-3 bg-white border-t border-slate-200 flex items-center space-x-2">
+                <input type="text" id="chatInput" placeholder="Escribe tu mensaje aquí..." onkeypress="handleKeyPress(event)" class="flex-1 bg-slate-100 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-brand-600 text-slate-800">
+                <button onclick="sendMessage()" class="bg-brand-600 hover:bg-brand-700 text-white w-8 h-8 rounded-xl flex items-center justify-center transition">
+                    <i class="fa-solid fa-paper-plane text-xs"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-900 text-slate-400 py-10 border-t border-slate-800 text-xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+            <div>
+                <p class="font-semibold text-slate-200">Universidad Tecnológica de Nezahualcóyotl</p>
+                <p class="text-slate-500 mt-0.5">Programa Institucional de Prevención y Bienestar Estudiantil</p>
+            </div>
+            <div class="flex space-x-6">
+                <a href="tel:8009112000" class="hover:text-white transition">Línea de la Vida: 800 911 2000</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        
+        // 1. WELCOME MODAL LOGIC
+        function closeWelcomeModal() {
+            document.getElementById('welcomeModal').classList.add('hidden');
+        }
+
+        // 2. MOBILE MENU TOGGLE
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        // 3. CAROUSEL LOGIC
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.carousel-item');
+
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                if (i === index) {
+                    slide.classList.remove('opacity-0');
+                    slide.classList.add('opacity-100');
+                } else {
+                    slide.classList.remove('opacity-100');
+                    slide.classList.add('opacity-0');
+                }
+            });
+        }
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % slides.length;
+            showSlide(currentSlide);
+        }
+
+        function prevSlide() {
+            currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+            showSlide(currentSlide);
+        }
+
+        setInterval(nextSlide, 5000); // Auto-advance carousel
+
+        // 4. FLYER MODAL LOGIC
+        function openFlyerModal(imgSrc, title, desc) {
+            document.getElementById('modalFlyerImg').src = imgSrc;
+            document.getElementById('modalFlyerTitle').innerText = title;
+            document.getElementById('modalFlyerDesc').innerText = desc;
+            document.getElementById('flyerModal').classList.remove('hidden');
+        }
+
+        function closeFlyerModal() {
+            document.getElementById('flyerModal').classList.add('hidden');
+        }
+
+        // 5. HUMAN CHAT LOGIC (Lic. Sofía)
+        function toggleChatWindow() {
+            const chat = document.getElementById('chatWindow');
+            chat.classList.toggle('hidden');
+        }
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function openChatWithQuestion(text) {
+            document.getElementById('chatWindow').classList.remove('hidden');
+            sendQuickMessage(text);
+        }
+
+        function sendQuickMessage(text) {
+            const input = document.getElementById('chatInput');
+            input.value = text;
+            sendMessage();
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            const chatMessages = document.getElementById('chatMessages');
+
+            // User Message
+            const userBubble = document.createElement('div');
+            userBubble.className = 'flex items-end justify-end space-x-2';
+            userBubble.innerHTML = `
+                <div class="bg-brand-600 text-white rounded-2xl rounded-tr-none p-3 shadow-sm max-w-[80%]">
+                    ${message}
+                </div>
+            `;
+            chatMessages.appendChild(userBubble);
+            input.value = '';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            // Simulated Response from Lic. Sofía
+            setTimeout(() => {
+                let responseText = "Gracias por comunicarte. En la UTN te acompañamos con total confidencialidad. ¿Te gustaría agendar una cita de orientación?";
+                
+                const lower = message.toLowerCase();
+                if (lower.includes('ubicación') || lower.includes('ubicacion') || lower.includes('cubículo') || lower.includes('donde')) {
+                    responseText = "Nos encontramos en el Edificio D de Servicios Estudiantiles, planta baja. ¡Puedes pasar libremente de 8:00 a 18:00 hrs!";
+                } else if (lower.includes('confidencial')) {
+                    responseText = "Absolutamente. Toda orientación brindada por el equipo psicopedagógico de la UTN es estrictamente confidencial y respetuosa.";
+                }
+
+                const botBubble = document.createElement('div');
+                botBubble.className = 'flex items-start space-x-2';
+                botBubble.innerHTML = `
+                    <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&q=80" class="w-7 h-7 rounded-full object-cover mt-1">
+                    <div class="bg-white border border-slate-200 rounded-2xl rounded-tl-none p-3 shadow-sm text-slate-700 max-w-[80%]">
+                        ${responseText}
+                    </div>
+                `;
+                chatMessages.appendChild(botBubble);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }, 800);
+        }
+
+        // 6. INITIALIZE LEAFLET MAP AT UTN
+        window.onload = function() {
+            // UTN Coordinates: 19.4002, -98.9959
+            const map = L.map('utnMap').setView([19.4002, -98.9959], 16);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+
+            L.marker([19.4002, -98.9959]).addTo(map)
+                .bindPopup('<b>UTN - Universidad Tecnológica de Nezahualcóyotl</b><br>Servicios Estudiantiles y Orientación.')
+                .openPopup();
+        };
+    </script>
 </body>
 </html>
