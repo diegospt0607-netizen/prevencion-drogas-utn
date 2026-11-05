@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prevención del Consumo de Drogas - UTN</title>
+    <title>Prevención del Consumo de Drogas & Tienda Institucional - UTN</title>
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -45,13 +45,6 @@
         body {
             font-family: 'Inter', sans-serif;
         }
-        .bg-pattern {
-            background-color: #ffffff;
-            background-image: radial-gradient(#1d4ed8 0.5px, transparent 0.5px), radial-gradient(#1d4ed8 0.5px, #ffffff 0.5px);
-            background-size: 20px 20px;
-            background-position: 0 0,10px 10px;
-            background-opacity: 0.05;
-        }
         .chat-scroll::-webkit-scrollbar {
             width: 5px;
         }
@@ -59,11 +52,32 @@
             background-color: #cbd5e1;
             border-radius: 10px;
         }
+        .captcha-box {
+            background-image: repeating-linear-gradient(45deg, #e2e8f0 0, #e2e8f0 2px, transparent 0, transparent 50%);
+            background-size: 10px 10px;
+            letter-spacing: 6px;
+            user-select: none;
+        }
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #printableTicket, #printableTicket * {
+                visibility: visible;
+            }
+            #printableTicket {
+                position: fixed;
+                left: 0;
+                top: 0;
+                width: 100%;
+                box-shadow: none !important;
+            }
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 flex flex-col min-h-screen relative antialiased">
 
-    <!-- WELCOME POP-UP MODAL -->
+    <!-- 1. WELCOME POP-UP MODAL -->
     <div id="welcomeModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-sm transition-opacity duration-300">
         <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 md:p-8 transform transition-all duration-300 scale-100 relative border-t-4 border-brand-600">
             <button onclick="closeWelcomeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 transition">
@@ -75,11 +89,11 @@
                 </div>
                 <div>
                     <span class="text-xs font-semibold text-brand-600 uppercase tracking-wider">Comunidad UTN</span>
-                    <h3 class="text-xl font-bold text-slate-900">Bienvenido al Portal de Prevención</h3>
+                    <h3 class="text-xl font-bold text-slate-900">Bienvenido al Portal Decide Vivir</h3>
                 </div>
             </div>
             <p class="text-slate-600 mb-6 leading-relaxed text-sm">
-                Tu bienestar físico y emocional es prioridad en la Universidad Tecnológica de Nezahualcóyotl. Aquí encontrarás información confiable, apoyo psicológico confidencial y orientación profesional.
+                Tu bienestar físico y emocional es prioridad en la Universidad Tecnológica de Nezahualcóyotl. Aquí encontrarás información confiable, tienda de artículos con causa, formularios de apoyo y orientación profesional.
             </p>
             <div class="bg-brand-50 p-4 rounded-xl border border-brand-100 mb-6 flex items-start space-x-3">
                 <i class="fa-solid fa-circle-info text-brand-600 mt-0.5"></i>
@@ -106,46 +120,81 @@
                     </div>
                     <div>
                         <span class="block font-bold text-slate-900 text-base md:text-lg leading-tight">Decide Vivir</span>
-                        <span class="block text-xs font-medium text-brand-600 uppercase tracking-wider">Prevención de Adicciones</span>
+                        <span class="block text-xs font-medium text-brand-600 uppercase tracking-wider">Portal & Tienda UTN</span>
                     </div>
                 </div>
 
                 <!-- Desktop Navigation -->
-                <nav class="hidden md:flex space-x-8 text-sm font-medium text-slate-600">
+                <nav class="hidden lg:flex space-x-6 text-xs font-semibold uppercase tracking-wider text-slate-600">
                     <a href="#inicio" class="hover:text-brand-600 transition">Inicio</a>
-                    <a href="#informacion" class="hover:text-brand-600 transition">Información</a>
-                    <a href="#folletos" class="hover:text-brand-600 transition">Volantes & Galería</a>
-                    <a href="#utn" class="hover:text-brand-600 transition">Ubicación UTN</a>
-                    <a href="#recursos" class="hover:text-brand-600 transition">Recursos</a>
+                    <a href="#informacion" class="hover:text-brand-600 transition">Contexto</a>
+                    <a href="#folletos" class="hover:text-brand-600 transition">Flyers</a>
+                    <a href="#tienda" class="hover:text-brand-600 transition text-brand-600">Catálogo / Tienda</a>
+                    <a href="#formularios" class="hover:text-brand-600 transition">Formularios</a>
+                    <a href="#basedatos" class="hover:text-brand-600 transition">Base de Datos</a>
+                    <a href="#utn" class="hover:text-brand-600 transition">Maps</a>
                 </nav>
 
-                <!-- Action Button -->
-                <div class="hidden md:flex">
-                    <a href="tel:8009112000" class="inline-flex items-center space-x-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-md shadow-brand-600/20 transition">
+                <!-- Action Buttons (Login + Cart) -->
+                <div class="hidden md:flex items-center space-x-3">
+                    <!-- Cart Button -->
+                    <button onclick="toggleCartModal()" class="relative bg-slate-100 hover:bg-slate-200 text-slate-700 p-2.5 rounded-xl transition">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                        <span id="cartBadge" class="absolute -top-1.5 -right-1.5 bg-red-600 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">0</span>
+                    </button>
+
+                    <!-- Login / Session Status Button -->
+                    <button id="authButton" onclick="openLoginModal()" class="inline-flex items-center space-x-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition">
+                        <i class="fa-solid fa-user-lock"></i>
+                        <span id="authButtonText">Iniciar Sesión</span>
+                    </button>
+
+                    <!-- Helpline -->
+                    <a href="tel:8009112000" class="inline-flex items-center space-x-1.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold px-3.5 py-2.5 rounded-xl shadow-md shadow-brand-600/20 transition">
                         <i class="fa-solid fa-phone"></i>
-                        <span>Línea de Ayuda 24/7</span>
+                        <span>24/7</span>
                     </a>
                 </div>
 
-                <!-- Mobile Menu Button -->
-                <button onclick="toggleMobileMenu()" class="md:hidden text-slate-600 hover:text-slate-900 focus:outline-none p-2">
-                    <i class="fa-solid fa-bars text-xl"></i>
-                </button>
+                <!-- Mobile Menu & Cart Button -->
+                <div class="flex items-center space-x-2 md:hidden">
+                    <button onclick="toggleCartModal()" class="relative bg-slate-100 text-slate-700 p-2 rounded-xl">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                        <span id="cartBadgeMobile" class="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">0</span>
+                    </button>
+                    <button onclick="toggleMobileMenu()" class="text-slate-600 hover:text-slate-900 focus:outline-none p-2">
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                </div>
             </div>
         </div>
 
         <!-- Mobile Menu -->
-        <div id="mobileMenu" class="hidden md:hidden bg-white border-b border-slate-200 px-4 pt-2 pb-4 space-y-3">
+        <div id="mobileMenu" class="hidden md:hidden bg-white border-b border-slate-200 px-4 pt-2 pb-4 space-y-2">
             <a href="#inicio" onclick="toggleMobileMenu()" class="block text-sm font-medium text-slate-700 hover:text-brand-600 py-1">Inicio</a>
-            <a href="#informacion" onclick="toggleMobileMenu()" class="block text-sm font-medium text-slate-700 hover:text-brand-600 py-1">Información</a>
-            <a href="#folletos" onclick="toggleMobileMenu()" class="block text-sm font-medium text-slate-700 hover:text-brand-600 py-1">Volantes & Galería</a>
+            <a href="#informacion" onclick="toggleMobileMenu()" class="block text-sm font-medium text-slate-700 hover:text-brand-600 py-1">Contexto e Información</a>
+            <a href="#folletos" onclick="toggleMobileMenu()" class="block text-sm font-medium text-slate-700 hover:text-brand-600 py-1">Volantes & Flyers</a>
+            <a href="#tienda" onclick="toggleMobileMenu()" class="block text-sm font-bold text-brand-600 py-1">Catálogo & Tienda</a>
+            <a href="#formularios" onclick="toggleMobileMenu()" class="block text-sm font-medium text-slate-700 hover:text-brand-600 py-1">Formularios</a>
+            <a href="#basedatos" onclick="toggleMobileMenu()" class="block text-sm font-medium text-slate-700 hover:text-brand-600 py-1">Base de Datos</a>
             <a href="#utn" onclick="toggleMobileMenu()" class="block text-sm font-medium text-slate-700 hover:text-brand-600 py-1">Ubicación UTN</a>
-            <a href="#recursos" onclick="toggleMobileMenu()" class="block text-sm font-medium text-slate-700 hover:text-brand-600 py-1">Recursos</a>
-            <a href="tel:8009112000" class="block text-center bg-brand-600 text-white text-xs font-bold py-2.5 rounded-xl">Línea de Ayuda: 800 911 2000</a>
+            <button onclick="openLoginModal(); toggleMobileMenu();" class="w-full text-center bg-slate-900 text-white text-xs font-bold py-2.5 rounded-xl">Iniciar Sesión / Token</button>
         </div>
     </header>
 
-    <!-- HERO SECTION -->
+    <!-- ACTIVE SESSION TOKEN BANNER -->
+    <div id="sessionBanner" class="hidden bg-emerald-900 text-emerald-100 text-xs py-2 px-4">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-2">
+            <div class="flex items-center space-x-2">
+                <i class="fa-solid fa-key text-emerald-400"></i>
+                <span>Sesión activa: <strong id="activeUserDisplay"></strong></span>
+                <span class="bg-emerald-800 px-2 py-0.5 rounded font-mono text-[11px]" id="activeTokenDisplay"></span>
+            </div>
+            <button onclick="logoutUser()" class="text-emerald-300 hover:text-white underline text-[11px]">Cerrar Sesión</button>
+        </div>
+    </div>
+
+    <!-- HERO SECTION & CARRUSEL -->
     <section id="inicio" class="relative bg-gradient-to-b from-brand-50/50 to-white py-12 md:py-20 overflow-hidden">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid md:grid-cols-2 gap-12 items-center">
@@ -160,24 +209,23 @@
                         Tu futuro se construye con <span class="text-brand-600">decisiones conscientes</span>
                     </h1>
                     <p class="text-slate-600 text-base md:text-lg leading-relaxed">
-                        Programa universitario de concienciación y prevención sobre el uso de sustancias nocivas. Espacio seguro para consultar, aprender y recibir orientación oportuna.
+                        Programa universitario de concienciación, prevención de adicciones y tienda solidaria de bienestar estudiantil. Espacio seguro para consultar, aprender y apoyar.
                     </p>
-                    <div class="flex flex-col sm:flex-row gap-3 pt-2">
-                        <button onclick="openChatWithQuestion('Hola, necesito información sobre el apoyo estudiantil')" class="inline-flex justify-center items-center space-x-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold px-6 py-3.5 rounded-xl shadow-lg shadow-brand-600/30 transition text-sm">
+                    <div class="flex flex-wrap gap-3 pt-2">
+                        <a href="#tienda" class="inline-flex justify-center items-center space-x-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold px-6 py-3.5 rounded-xl shadow-lg shadow-brand-600/30 transition text-sm">
+                            <i class="fa-solid fa-bag-shopping"></i>
+                            <span>Ir al Catálogo</span>
+                        </a>
+                        <button onclick="openChatWithQuestion('Hola, necesito información sobre el apoyo estudiantil')" class="inline-flex justify-center items-center space-x-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-6 py-3.5 rounded-xl transition text-sm">
                             <i class="fa-solid fa-comments"></i>
                             <span>Hablar con Orientadora</span>
                         </button>
-                        <a href="#informacion" class="inline-flex justify-center items-center space-x-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-6 py-3.5 rounded-xl transition text-sm">
-                            <span>Saber más</span>
-                            <i class="fa-solid fa-arrow-down"></i>
-                        </a>
                     </div>
                 </div>
 
                 <!-- Right Carousel Image Component -->
                 <div class="relative">
                     <div class="relative rounded-2xl overflow-hidden shadow-2xl bg-slate-900 aspect-video md:aspect-4/3">
-                        <!-- Carousel Slides -->
                         <div id="carouselSlides" class="relative w-full h-full">
                             <div class="carousel-item absolute inset-0 transition-opacity duration-700 opacity-100">
                                 <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1000&q=80" alt="Estudiantes universitarios" class="w-full h-full object-cover">
@@ -194,7 +242,7 @@
                             <div class="carousel-item absolute inset-0 transition-opacity duration-700 opacity-0">
                                 <img src="https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=1000&q=80" alt="Talleres preventivos" class="w-full h-full object-cover">
                                 <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent flex items-end p-6">
-                                    <p class="text-white text-sm font-medium">Talleres interactivos y conferencias de salud.</p>
+                                    <p class="text-white text-sm font-medium">Talleres interactivos, cultura y deporte universitario.</p>
                                 </div>
                             </div>
                         </div>
@@ -213,17 +261,16 @@
         </div>
     </section>
 
-    <!-- INFORMACIÓN / TARJETAS -->
+    <!-- CONTEXTO E INFORMACIÓN -->
     <section id="informacion" class="py-16 bg-white border-y border-slate-100">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-2xl mx-auto mb-12">
-                <span class="text-xs font-bold text-brand-600 uppercase tracking-widest">Información Clave</span>
+                <span class="text-xs font-bold text-brand-600 uppercase tracking-widest">Contexto Universitario</span>
                 <h2 class="text-2xl md:text-3xl font-extrabold text-slate-900 mt-1">Conocer los riesgos es el primer paso</h2>
-                <p class="text-slate-600 mt-2 text-sm">Aprende sobre los impactos del consumo de sustancias y los mitos más comunes en la juventud.</p>
+                <p class="text-slate-600 mt-2 text-sm">Contexto actual sobre los impactos del consumo de sustancias y los factores de protección en la juventud universitaria.</p>
             </div>
 
             <div class="grid md:grid-cols-3 gap-8">
-                <!-- Card 1 -->
                 <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-6 hover:shadow-xl transition duration-300 flex flex-col justify-between">
                     <div>
                         <div class="w-12 h-12 bg-brand-100 text-brand-600 rounded-xl flex items-center justify-center mb-4 text-xl">
@@ -240,7 +287,6 @@
                     </span>
                 </div>
 
-                <!-- Card 2 -->
                 <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-6 hover:shadow-xl transition duration-300 flex flex-col justify-between">
                     <div>
                         <div class="w-12 h-12 bg-brand-100 text-brand-600 rounded-xl flex items-center justify-center mb-4 text-xl">
@@ -248,7 +294,7 @@
                         </div>
                         <h3 class="text-lg font-bold text-slate-900 mb-2">Desempeño Académico</h3>
                         <p class="text-slate-600 text-xs leading-relaxed mb-4">
-                            El uso continuo ocasiona baja en las calificaciones, ausentismo y mayor riesgo de deserción escolar en el nivel universitario.
+                            El uso continuo ocasiona baja en las calificaciones, ausentismo y mayor riesgo de deserción escolar en el nivel superior.
                         </p>
                     </div>
                     <span class="text-xs font-semibold text-brand-600 flex items-center space-x-1">
@@ -257,15 +303,14 @@
                     </span>
                 </div>
 
-                <!-- Card 3 -->
                 <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-6 hover:shadow-xl transition duration-300 flex flex-col justify-between">
                     <div>
                         <div class="w-12 h-12 bg-brand-100 text-brand-600 rounded-xl flex items-center justify-center mb-4 text-xl">
                             <i class="fa-solid fa-people-group"></i>
                         </div>
-                        <h3 class="text-lg font-bold text-slate-900 mb-2">Relaciones Personales</h3>
+                        <h3 class="text-lg font-bold text-slate-900 mb-2">Entorno Social y Familiar</h3>
                         <p class="text-slate-600 text-xs leading-relaxed mb-4">
-                            Afecta los lazos con amigos, familia y pareja, produciendo aislamientos, conflictos sociales y problemas de conducta.
+                            Fortalecer los lazos con amigos, familia y comunidad universitaria previene el aislamiento y fomenta hábitos saludables.
                         </p>
                     </div>
                     <span class="text-xs font-semibold text-brand-600 flex items-center space-x-1">
@@ -277,19 +322,16 @@
         </div>
     </section>
 
-    <!-- VOLANTES Y GALERÍA INFOGRÁFICA -->
+    <!-- VOLANTES / FLYERS -->
     <section id="folletos" class="py-16 bg-slate-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-2xl mx-auto mb-12">
                 <span class="text-xs font-bold text-brand-600 uppercase tracking-widest">Material Gráfico</span>
-                <h2 class="text-2xl md:text-3xl font-extrabold text-slate-900 mt-1">Volantes Informativos & Infografías</h2>
-                <p class="text-slate-600 mt-2 text-sm">Haz clic en cualquier imagen para verla en tamaño completo e informarte en detalle.</p>
+                <h2 class="text-2xl md:text-3xl font-extrabold text-slate-900 mt-1">Flyers Informativos & Infografías</h2>
+                <p class="text-slate-600 mt-2 text-sm">Haz clic en cualquier flyer para visualizarlo en pantalla completa.</p>
             </div>
 
-            <!-- Gallery Grid -->
             <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                
-                <!-- Flyer 1 -->
                 <div onclick="openFlyerModal('https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=800&q=80', 'Mitos y Realidades del Consumo', 'Información sobre creencias falsas y verdades científicas de las adicciones.')" class="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200 hover:shadow-md transition cursor-pointer group">
                     <div class="relative aspect-4/3 overflow-hidden bg-slate-100">
                         <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=800&q=80" alt="Flyer 1" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
@@ -298,12 +340,11 @@
                         </div>
                     </div>
                     <div class="p-4">
-                        <span class="text-[10px] font-bold text-brand-600 uppercase tracking-wider">Folleto Digital</span>
+                        <span class="text-[10px] font-bold text-brand-600 uppercase tracking-wider">Flyer Digital 01</span>
                         <h3 class="font-bold text-slate-900 text-sm mt-1">Mitos y Realidades del Consumo</h3>
                     </div>
                 </div>
 
-                <!-- Flyer 2 -->
                 <div onclick="openFlyerModal('https://images.unsplash.com/photo-1505751172876-fa1923c5c528?auto=format&fit=crop&w=800&q=80', 'Señales de Alerta Preventiva', 'Aprende a reconocer cuando un amigo o compañero necesita ayuda profesional.')" class="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200 hover:shadow-md transition cursor-pointer group">
                     <div class="relative aspect-4/3 overflow-hidden bg-slate-100">
                         <img src="https://images.unsplash.com/photo-1505751172876-fa1923c5c528?auto=format&fit=crop&w=800&q=80" alt="Flyer 2" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
@@ -312,12 +353,11 @@
                         </div>
                     </div>
                     <div class="p-4">
-                        <span class="text-[10px] font-bold text-brand-600 uppercase tracking-wider">Infografía UTN</span>
+                        <span class="text-[10px] font-bold text-brand-600 uppercase tracking-wider">Flyer Digital 02</span>
                         <h3 class="font-bold text-slate-900 text-sm mt-1">Señales de Alerta Temprana</h3>
                     </div>
                 </div>
 
-                <!-- Flyer 3 -->
                 <div onclick="openFlyerModal('https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?auto=format&fit=crop&w=800&q=80', 'Ruta de Atención Estudiantil UTN', 'Pasos para solicitar orientación psicológica confidencial en el campus.')" class="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200 hover:shadow-md transition cursor-pointer group">
                     <div class="relative aspect-4/3 overflow-hidden bg-slate-100">
                         <img src="https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?auto=format&fit=crop&w=800&q=80" alt="Flyer 3" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
@@ -326,11 +366,155 @@
                         </div>
                     </div>
                     <div class="p-4">
-                        <span class="text-[10px] font-bold text-brand-600 uppercase tracking-wider">Guía de Apoyo</span>
+                        <span class="text-[10px] font-bold text-brand-600 uppercase tracking-wider">Flyer Digital 03</span>
                         <h3 class="font-bold text-slate-900 text-sm mt-1">Ruta de Atención Psicológica</h3>
                     </div>
                 </div>
+            </div>
+        </div>
+    </section>
 
+    <!-- TIENDA Y CATÁLOGO DE PRODUCTOS -->
+    <section id="tienda" class="py-16 bg-white border-t border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-12">
+                <div>
+                    <span class="text-xs font-bold text-brand-600 uppercase tracking-widest">Tienda Oficial Con Causa</span>
+                    <h2 class="text-2xl md:text-3xl font-extrabold text-slate-900 mt-1">Catálogo de Artículos "Decide Vivir"</h2>
+                    <p class="text-slate-600 mt-2 text-sm">Adquiere artículos promocionales para financiar talleres deportivos y de salud mental en la UTN.</p>
+                </div>
+                <button onclick="toggleCartModal()" class="mt-4 md:mt-0 inline-flex items-center space-x-2 bg-brand-50 hover:bg-brand-100 text-brand-700 font-bold text-xs px-4 py-3 rounded-xl border border-brand-200 transition">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span>Ver Carrito y Pagar con PayPal</span>
+                </button>
+            </div>
+
+            <!-- Catalog Grid Rendered via JS -->
+            <div id="catalogGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </div>
+    </section>
+
+    <!-- FORMULARIOS (CITAS Y CONTACTO) -->
+    <section id="formularios" class="py-16 bg-slate-50 border-t border-slate-200">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-white rounded-2xl shadow-lg border border-slate-200 p-6 md:p-10">
+                <div class="text-center max-w-xl mx-auto mb-8">
+                    <span class="text-xs font-bold text-brand-600 uppercase tracking-widest">Atención Personalizada</span>
+                    <h2 class="text-2xl font-extrabold text-slate-900 mt-1">Formulario de Solicitud de Orientación</h2>
+                    <p class="text-slate-600 mt-1 text-xs">Los datos ingresados se almacenan de forma segura en la Base de Datos del sistema.</p>
+                </div>
+
+                <form id="orientationForm" onsubmit="saveFormSubmission(event)" class="grid sm:grid-cols-2 gap-4 text-xs">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Nombre Completo *</label>
+                        <input type="text" id="formNombre" required placeholder="Ej. Carlos Hernández" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-600">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Matrícula UTN *</label>
+                        <input type="text" id="formMatricula" required placeholder="Ej. 23001456" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-600">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Correo Institucional *</label>
+                        <input type="email" id="formCorreo" required placeholder="alumno@utn.edu.mx" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-600">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">División Académica *</label>
+                        <select id="formCarrera" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-600">
+                            <option value="Entornos Virtuales y Negocios Digitales">Entornos Virtuales y Negocios Digitales</option>
+                            <option value="Desarrollo de Software Multiplataforma">Desarrollo de Software Multiplataforma</option>
+                            <option value="Administración">Administración</option>
+                            <option value="Mecatrónica">Mecatrónica</option>
+                            <option value="Procesos Industriales">Procesos Industriales</option>
+                        </select>
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label class="block font-semibold text-slate-700 mb-1">Motivo o Comentario *</label>
+                        <textarea id="formMensaje" rows="3" required placeholder="Describe brevemente cómo podemos apoyarte..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-600"></textarea>
+                    </div>
+                    <div class="sm:col-span-2 flex justify-end pt-2">
+                        <button type="submit" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold px-6 py-3 rounded-xl shadow-md transition">
+                            <i class="fa-solid fa-database mr-1.5"></i> Guardar en Base de Datos
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- BASE DE DATOS (PANEL VISUAL EN TIEMPO REAL) -->
+    <section id="basedatos" class="py-16 bg-white border-t border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row md:items-center justify-between mb-8">
+                <div>
+                    <span class="text-xs font-bold text-brand-600 uppercase tracking-widest">Persistencia LocalStorage / JSON</span>
+                    <h2 class="text-2xl font-extrabold text-slate-900 mt-1">Monitor de Base de Datos del Sistema</h2>
+                    <p class="text-slate-600 text-xs mt-1">Visualiza en tiempo real los registros de usuarios (tokens), formularios y tickets de compra PayPal.</p>
+                </div>
+                <div class="flex space-x-2 mt-4 md:mt-0">
+                    <button onclick="exportDatabaseJSON()" class="bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition">
+                        <i class="fa-solid fa-download mr-1"></i> Exportar JSON
+                    </button>
+                    <button onclick="clearDatabase()" class="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-xs font-semibold px-4 py-2.5 rounded-xl transition">
+                        <i class="fa-solid fa-trash mr-1"></i> Reiniciar BD
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-6 text-xs">
+                <!-- Tabla 1: Sesiones y Tokens -->
+                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5">
+                    <h3 class="font-bold text-slate-900 text-sm mb-3 flex items-center justify-between">
+                        <span><i class="fa-solid fa-user-shield text-brand-600 mr-1.5"></i>Tabla: Logueos & Tokens</span>
+                        <span id="dbCountLogins" class="bg-brand-100 text-brand-700 px-2 py-0.5 rounded-full text-[10px]">0</span>
+                    </h3>
+                    <div id="dbLoginsList" class="space-y-2 max-h-60 overflow-y-auto pr-1"></div>
+                </div>
+
+                <!-- Tabla 2: Formularios -->
+                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5">
+                    <h3 class="font-bold text-slate-900 text-sm mb-3 flex items-center justify-between">
+                        <span><i class="fa-solid fa-file-lines text-brand-600 mr-1.5"></i>Tabla: Formularios</span>
+                        <span id="dbCountForms" class="bg-brand-100 text-brand-700 px-2 py-0.5 rounded-full text-[10px]">0</span>
+                    </h3>
+                    <div id="dbFormsList" class="space-y-2 max-h-60 overflow-y-auto pr-1"></div>
+                </div>
+
+                <!-- Tabla 3: Ventas / Tickets -->
+                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5">
+                    <h3 class="font-bold text-slate-900 text-sm mb-3 flex items-center justify-between">
+                        <span><i class="fa-solid fa-receipt text-brand-600 mr-1.5"></i>Tabla: Tickets & PayPal</span>
+                        <span id="dbCountOrders" class="bg-brand-100 text-brand-700 px-2 py-0.5 rounded-full text-[10px]">0</span>
+                    </h3>
+                    <div id="dbOrdersList" class="space-y-2 max-h-60 overflow-y-auto pr-1"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- UBICACIÓN UTN Y MAPA -->
+    <section id="utn" class="py-16 bg-slate-50 border-t border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-3 gap-8 items-center">
+                <div class="space-y-4 lg:col-span-1">
+                    <span class="text-xs font-bold text-brand-600 uppercase tracking-widest">Atención Presencial (Maps)</span>
+                    <h2 class="text-2xl font-extrabold text-slate-900">Ubicación Campus UTN</h2>
+                    <p class="text-slate-600 text-sm leading-relaxed">
+                        Visítanos en el Departamento de Servicios Estudiantiles y Orientación Educativa dentro de la Universidad Tecnológica de Nezahualcóyotl.
+                    </p>
+                    <div class="space-y-3 pt-2 text-xs text-slate-700">
+                        <div class="flex items-start space-x-3">
+                            <i class="fa-solid fa-location-dot text-brand-600 text-base mt-0.5"></i>
+                            <span>Circuito Universidad Tecnológica s/n, Col. Benito Juárez, Nezahualcóyotl, Estado de México.</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <i class="fa-solid fa-clock text-brand-600 text-base"></i>
+                            <span>Lunes a Viernes: 08:00 hrs - 18:00 hrs</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Leaflet Interactive Map -->
+                <div class="lg:col-span-2 rounded-2xl overflow-hidden border border-slate-200 shadow-md h-80 relative z-10" id="utnMap"></div>
             </div>
         </div>
     </section>
@@ -351,57 +535,170 @@
         </div>
     </div>
 
-    <!-- UBICACIÓN UTN Y MAPA -->
-    <section id="utn" class="py-16 bg-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid lg:grid-cols-3 gap-8 items-center">
-                
-                <div class="space-y-4 lg:col-span-1">
-                    <span class="text-xs font-bold text-brand-600 uppercase tracking-widest">Atención Presencial</span>
-                    <h2 class="text-2xl font-extrabold text-slate-900">Ubicación Campus UTN</h2>
-                    <p class="text-slate-600 text-sm leading-relaxed">
-                        Visítanos en el Departamento de Servicios Estudiantiles y Orientación Educativa dentro de la Universidad Tecnológica de Nezahualcóyotl.
-                    </p>
-                    <div class="space-y-3 pt-2 text-xs text-slate-700">
-                        <div class="flex items-start space-x-3">
-                            <i class="fa-solid fa-location-dot text-brand-600 text-base mt-0.5"></i>
-                            <span>Circuito Universidad Tecnológica s/n, Col. Benito Juárez, Nezahualcóyotl, Estado de México.</span>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <i class="fa-solid fa-clock text-brand-600 text-base"></i>
-                            <span>Lunes a Viernes: 08:00 hrs - 18:00 hrs</span>
-                        </div>
+    <!-- LOGIN MODAL (CON CAPTCHA Y TOKEN) -->
+    <div id="loginModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 md:p-8 shadow-2xl relative border-t-4 border-brand-600">
+            <button onclick="closeLoginModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 w-8 h-8 flex items-center justify-center rounded-full">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <div class="flex items-center space-x-3 mb-6">
+                <div class="w-11 h-11 bg-brand-100 text-brand-600 rounded-xl flex items-center justify-center text-lg">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <div>
+                    <span class="text-[11px] font-bold text-brand-600 uppercase tracking-wider">Seguridad UTN</span>
+                    <h3 class="text-lg font-extrabold text-slate-900">Inicio de Sesión & Token</h3>
+                </div>
+            </div>
+
+            <!-- STEP 1: CREDENTIALS + CAPTCHA -->
+            <form id="loginStep1Form" onsubmit="handleLoginStep1(event)" class="space-y-4 text-xs">
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Usuario o Correo Institucional *</label>
+                    <input type="text" id="loginUser" required placeholder="alumno@utn.edu.mx" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-600">
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Contraseña *</label>
+                    <input type="password" id="loginPass" required placeholder="••••••••" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-600">
+                </div>
+
+                <!-- CAPTCHA Verification -->
+                <div class="bg-slate-100 p-3.5 rounded-xl border border-slate-200 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-slate-700">Verificación CAPTCHA</span>
+                        <button type="button" onclick="generateCaptcha()" class="text-brand-600 hover:underline font-semibold">
+                            <i class="fa-solid fa-rotate mr-1"></i>Nuevo código
+                        </button>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <div id="captchaDisplay" class="captcha-box flex-1 bg-white border border-slate-300 rounded-lg py-2 text-center font-mono font-black text-base text-slate-800 italic"></div>
+                        <input type="text" id="captchaInput" required placeholder="Ingresa código" class="w-36 bg-white border border-slate-300 rounded-lg px-3 py-2 text-center font-mono uppercase focus:outline-none focus:ring-2 focus:ring-brand-600">
                     </div>
                 </div>
 
-                <!-- Leaflet Interactive Map -->
-                <div class="lg:col-span-2 rounded-2xl overflow-hidden border border-slate-200 shadow-md h-80 relative z-10" id="utnMap">
+                <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 rounded-xl shadow-lg shadow-brand-600/30 transition">
+                    Generar Token de Acceso
+                </button>
+            </form>
+
+            <!-- STEP 2: TOKEN VALIDATION -->
+            <form id="loginStep2Form" onsubmit="handleLoginStep2(event)" class="hidden space-y-4 text-xs">
+                <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-emerald-900">
+                    <p class="font-bold mb-1"><i class="fa-solid fa-key mr-1"></i> Token de Seguridad Generado:</p>
+                    <p class="text-[11px] mb-2">Copia o ingresa el siguiente token de 6 dígitos para autenticar tu sesión:</p>
+                    <div id="generatedTokenBox" class="bg-white border border-emerald-300 rounded-lg py-2 text-center font-mono font-black text-lg tracking-widest text-emerald-700"></div>
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Ingresa el Token de 6 dígitos *</label>
+                    <input type="text" id="tokenInput" required placeholder="Ej. 482910" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-center font-mono text-sm tracking-widest focus:outline-none focus:ring-2 focus:ring-brand-600">
+                </div>
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow-lg transition">
+                    Verificar Token e Iniciar Sesión
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- CARRITO DE COMPRAS + PAYPAL MODAL -->
+    <div id="cartModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+            <div class="bg-slate-900 text-white p-5 flex items-center justify-between">
+                <div class="flex items-center space-x-2.5">
+                    <i class="fa-solid fa-cart-shopping text-brand-400 text-lg"></i>
+                    <h3 class="font-bold text-base">Carrito de Compras UTN</h3>
+                </div>
+                <button onclick="toggleCartModal()" class="text-slate-400 hover:text-white">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div id="cartItemsContainer" class="p-5 overflow-y-auto flex-1 space-y-3 text-xs"></div>
+
+            <div class="p-5 bg-slate-50 border-t border-slate-200 space-y-4">
+                <div class="space-y-1 text-xs">
+                    <div class="flex justify-between text-slate-600">
+                        <span>Subtotal:</span>
+                        <span id="cartSubtotal">$0.00 MXN</span>
+                    </div>
+                    <div class="flex justify-between text-slate-600">
+                        <span>IVA (16%):</span>
+                        <span id="cartTax">$0.00 MXN</span>
+                    </div>
+                    <div class="flex justify-between text-base font-extrabold text-slate-900 pt-1 border-t border-slate-200">
+                        <span>Total a Pagar:</span>
+                        <span id="cartTotal">$0.00 MXN</span>
+                    </div>
                 </div>
 
+                <!-- Simulated PayPal Button -->
+                <button onclick="processPayPalCheckout()" class="w-full bg-[#ffc439] hover:bg-[#f4bb30] text-[#003087] font-extrabold py-3 px-4 rounded-xl shadow flex items-center justify-center space-x-2 transition text-sm">
+                    <i class="fa-brands fa-paypal text-lg"></i>
+                    <span>Pagar ahora con PayPal</span>
+                </button>
             </div>
         </div>
-    </section>
+    </div>
 
-    <!-- HUMAN FLOATING CHAT WIDGET (Lic. Sofía) -->
-    <div class="fixed bottom-5 right-5 z-50">
-        
-        <!-- Chat Toggle Button -->
+    <!-- TICKET DE COMPRA MODAL -->
+    <div id="ticketModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
+        <div id="printableTicket" class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 text-xs font-mono">
+            <div class="text-center border-b border-dashed border-slate-300 pb-4 mb-4">
+                <div class="inline-block bg-brand-600 text-white font-black px-3 py-1 rounded-lg text-sm mb-2">UTN - DECIDE VIVIR</div>
+                <h3 class="font-bold text-slate-900 text-sm">TICKET OFICIAL DE COMPRA</h3>
+                <p class="text-slate-500 text-[11px]">Universidad Tecnológica de Nezahualcóyotl</p>
+                <p id="ticketDate" class="text-slate-500 text-[11px] mt-1"></p>
+            </div>
+
+            <div class="space-y-1 mb-4 text-[11px]">
+                <div class="flex justify-between">
+                    <span class="text-slate-500">FOLIO TICKET:</span>
+                    <strong id="ticketFolio" class="text-slate-900"></strong>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-500">ID TRANSACCIÓN PAYPAL:</span>
+                    <strong id="ticketPayPalId" class="text-blue-700"></strong>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-500">CLIENTE / SESIÓN:</span>
+                    <strong id="ticketCustomer" class="text-slate-900"></strong>
+                </div>
+            </div>
+
+            <div class="border-y border-dashed border-slate-300 py-3 mb-4 space-y-2" id="ticketItemsList"></div>
+
+            <div class="space-y-1 text-right mb-6">
+                <div class="text-slate-600">Subtotal: <span id="ticketSubtotal"></span></div>
+                <div class="text-slate-600">IVA (16%): <span id="ticketTax"></span></div>
+                <div class="text-sm font-extrabold text-slate-900">TOTAL PAGADO: <span id="ticketTotal"></span></div>
+            </div>
+
+            <div class="flex space-x-2 print:hidden">
+                <button onclick="window.print()" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-sans font-semibold py-2.5 rounded-xl transition">
+                    <i class="fa-solid fa-print mr-1"></i> Imprimir Ticket
+                </button>
+                <button onclick="closeTicketModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-sans font-semibold py-2.5 rounded-xl transition">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AVATAR & CHATBOT FLOATING WIDGET (Lic. Sofía) -->
+    <div class="fixed bottom-5 right-5 z-40">
         <button onclick="toggleChatWindow()" class="group bg-brand-600 hover:bg-brand-700 text-white rounded-full p-2.5 shadow-2xl flex items-center space-x-3 transition transform hover:scale-105 border-2 border-white">
             <div class="relative w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow">
-                <!-- Human Avatar Image -->
                 <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&q=80" alt="Lic. Sofía Avatar" class="w-full h-full object-cover">
                 <span class="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-white rounded-full"></span>
             </div>
             <div class="text-left pr-3 hidden sm:block">
-                <span class="block text-xs font-bold leading-tight">Lic. Sofía</span>
-                <span class="block text-[10px] text-brand-100">Orientadora UTN</span>
+                <span class="block text-xs font-bold leading-tight">Lic. Sofía (Avatar)</span>
+                <span class="block text-[10px] text-brand-100">Chatbot Orientadora UTN</span>
             </div>
         </button>
 
         <!-- Chat Window -->
         <div id="chatWindow" class="hidden absolute bottom-16 right-0 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col h-[480px] transition-all">
-            
-            <!-- Chat Header -->
             <div class="bg-brand-600 text-white p-4 flex items-center justify-between">
                 <div class="flex items-center space-x-3">
                     <div class="relative w-10 h-10 rounded-full overflow-hidden border border-white/50">
@@ -411,7 +708,7 @@
                         <h4 class="font-bold text-sm leading-tight">Lic. Sofía Martínez</h4>
                         <span class="text-[11px] text-brand-100 flex items-center space-x-1">
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                            <span>En línea para ayudarte</span>
+                            <span>Chatbot Activo 24/7</span>
                         </span>
                     </div>
                 </div>
@@ -420,27 +717,27 @@
                 </button>
             </div>
 
-            <!-- Chat Messages Area -->
             <div id="chatMessages" class="flex-1 p-4 overflow-y-auto space-y-3 text-xs chat-scroll bg-slate-50">
                 <div class="flex items-start space-x-2">
                     <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&q=80" class="w-7 h-7 rounded-full object-cover mt-1">
                     <div class="bg-white border border-slate-200 rounded-2xl rounded-tl-none p-3 shadow-sm text-slate-700 max-w-[80%]">
-                        ¡Hola! Soy la Lic. Sofía, orientadora educativa de la UTN. ¿En qué te puedo apoyar hoy de manera confidencial?
+                        ¡Hola! Soy el avatar virtual de la Lic. Sofía, orientadora de la UTN. ¿Te ayudo con orientación, la tienda solidaria o tu registro?
                     </div>
                 </div>
             </div>
 
-            <!-- Quick Questions -->
             <div class="p-2 bg-white border-t border-slate-100 flex space-x-2 overflow-x-auto text-[11px]">
                 <button onclick="sendQuickMessage('¿Dónde está el cubículo de orientación?')" class="bg-slate-100 hover:bg-brand-50 hover:text-brand-600 text-slate-600 px-2.5 py-1 rounded-full whitespace-nowrap transition">
-                    📍 UBICACIÓN CUBÍCULO
+                    📍 UBICACIÓN
+                </button>
+                <button onclick="sendQuickMessage('¿Cómo compro en la tienda con PayPal?')" class="bg-slate-100 hover:bg-brand-50 hover:text-brand-600 text-slate-600 px-2.5 py-1 rounded-full whitespace-nowrap transition">
+                    💳 TIENDA & PAYPAL
                 </button>
                 <button onclick="sendQuickMessage('¿Es confidencial el apoyo?')" class="bg-slate-100 hover:bg-brand-50 hover:text-brand-600 text-slate-600 px-2.5 py-1 rounded-full whitespace-nowrap transition">
                     🔒 CONFIDENCIALIDAD
                 </button>
             </div>
 
-            <!-- Chat Input -->
             <div class="p-3 bg-white border-t border-slate-200 flex items-center space-x-2">
                 <input type="text" id="chatInput" placeholder="Escribe tu mensaje aquí..." onkeypress="handleKeyPress(event)" class="flex-1 bg-slate-100 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-brand-600 text-slate-800">
                 <button onclick="sendMessage()" class="bg-brand-600 hover:bg-brand-700 text-white w-8 h-8 rounded-xl flex items-center justify-center transition">
@@ -451,11 +748,11 @@
     </div>
 
     <!-- FOOTER -->
-    <footer class="bg-slate-900 text-slate-400 py-10 border-t border-slate-800 text-xs">
+    <footer class="bg-slate-900 text-slate-400 py-10 border-t border-slate-800 text-xs mt-auto">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div>
-                <p class="font-semibold text-slate-200">Universidad Tecnológica de Nezahualcóyotl</p>
-                <p class="text-slate-500 mt-0.5">Programa Institucional de Prevención y Bienestar Estudiantil</p>
+                <p class="font-semibold text-slate-200">Universidad Tecnológica de Nezahualcóyotl (UTN)</p>
+                <p class="text-slate-500 mt-0.5">Portal Decide Vivir — Prevención, Tienda Institucional & Base de Datos</p>
             </div>
             <div class="flex space-x-6">
                 <a href="tel:8009112000" class="hover:text-white transition">Línea de la Vida: 800 911 2000</a>
@@ -467,31 +764,410 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script>
-        
-        // 1. WELCOME MODAL LOGIC
+        // ==========================================
+        // 1. PRODUCT CATALOG DATA (TIENDA)
+        // ==========================================
+        const catalogProducts = [
+            {
+                id: 1,
+                name: "Playera Oficial 'Decide Vivir' UTN",
+                category: "Textil Universitario",
+                price: 250.00,
+                image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=600&q=80",
+                desc: "Algodón 100% con escudo conmemorativo de prevención y bienestar estudiantil."
+            },
+            {
+                id: 2,
+                name: "Termo Deportivo Acero Inoxidable",
+                category: "Vida Saludable",
+                price: 180.00,
+                image: "https://images.unsplash.com/photo-1602143407151-7111542de6e8?auto=format&fit=crop&w=600&q=80",
+                desc: "Mantén tu hidratación en talleres deportivos del campus. Capacidad 750 ml."
+            },
+            {
+                id: 3,
+                name: "Guía Impresa de Salud Emocional",
+                category: "Material Educativo",
+                price: 95.00,
+                image: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=600&q=80",
+                desc: "Manual práctico con ejercicios de manejo de estrés, directorio de ayuda y prevención."
+            },
+            {
+                id: 4,
+                name: "Sudadera Universitaria UTN Azul Rey",
+                category: "Textil Universitario",
+                price: 480.00,
+                image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&w=600&q=80",
+                desc: "Edición especial Comunidad UTN Libre de Adicciones. Unisex."
+            },
+            {
+                id: 5,
+                name: "Kit Deportivo Estudiante Activo",
+                category: "Deporte y Prevención",
+                price: 320.00,
+                image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=600&q=80",
+                desc: "Incluye cuerda de salto, banda de resistencia y morral deportivo institucional."
+            },
+            {
+                id: 6,
+                name: "Pack 3 Pulseras Solidarias UTN",
+                category: "Accesorios Con Causa",
+                price: 60.00,
+                image: "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&w=600&q=80",
+                desc: "Pulseras tejidas con mensaje 'Decide Vivir'. Fondos destinados a talleres."
+            }
+        ];
+
+        let cart = [];
+        let currentCaptcha = "";
+        let pendingLoginUser = "";
+        let generatedSecurityToken = "";
+
+        // Render Catalog
+        function renderCatalog() {
+            const grid = document.getElementById('catalogGrid');
+            grid.innerHTML = catalogProducts.map(p => `
+                <div class="bg-slate-50 rounded-2xl overflow-hidden border border-slate-200 hover:shadow-lg transition flex flex-col justify-between">
+                    <div>
+                        <div class="aspect-4/3 bg-slate-200 overflow-hidden relative">
+                            <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover">
+                            <span class="absolute top-3 left-3 bg-slate-900/80 text-white text-[10px] font-bold px-2.5 py-1 rounded-full">${p.category}</span>
+                        </div>
+                        <div class="p-5">
+                            <h3 class="font-bold text-slate-900 text-base">${p.name}</h3>
+                            <p class="text-slate-600 text-xs mt-1 leading-relaxed">${p.desc}</p>
+                        </div>
+                    </div>
+                    <div class="p-5 pt-0 flex items-center justify-between">
+                        <span class="text-lg font-extrabold text-brand-600">$${p.price.toFixed(2)} <small class="text-[10px] text-slate-500">MXN</small></span>
+                        <button onclick="addToCart(${p.id})" class="bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow transition flex items-center space-x-1.5">
+                            <i class="fa-solid fa-cart-plus"></i>
+                            <span>Agregar</span>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ==========================================
+        // 2. CARRITO, PAYPAL & TICKET LOGIC
+        // ==========================================
+        function addToCart(productId) {
+            const prod = catalogProducts.find(p => p.id === productId);
+            const existing = cart.find(item => item.id === productId);
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                cart.push({ ...prod, qty: 1 });
+            }
+            updateCartUI();
+        }
+
+        function changeCartQty(productId, delta) {
+            const item = cart.find(i => i.id === productId);
+            if (!item) return;
+            item.qty += delta;
+            if (item.qty <= 0) {
+                cart = cart.filter(i => i.id !== productId);
+            }
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const totalItems = cart.reduce((sum, i) => sum + i.qty, 0);
+            document.getElementById('cartBadge').innerText = totalItems;
+            document.getElementById('cartBadgeMobile').innerText = totalItems;
+
+            const container = document.getElementById('cartItemsContainer');
+            if (cart.length === 0) {
+                container.innerHTML = `<p class="text-center text-slate-400 py-8">Tu carrito está vacío. Agrega artículos del catálogo.</p>`;
+            } else {
+                container.innerHTML = cart.map(item => `
+                    <div class="flex items-center justify-between bg-slate-50 p-3 rounded-xl border border-slate-200">
+                        <div class="flex items-center space-x-3">
+                            <img src="${item.image}" class="w-12 h-12 rounded-lg object-cover">
+                            <div>
+                                <h4 class="font-bold text-slate-900">${item.name}</h4>
+                                <span class="text-slate-500">$${item.price.toFixed(2)} x ${item.qty}</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="changeCartQty(${item.id}, -1)" class="w-6 h-6 rounded bg-slate-200 hover:bg-slate-300 font-bold">-</button>
+                            <span class="font-bold">${item.qty}</span>
+                            <button onclick="changeCartQty(${item.id}, 1)" class="w-6 h-6 rounded bg-slate-200 hover:bg-slate-300 font-bold">+</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            const subtotal = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
+            const tax = subtotal * 0.16;
+            const total = subtotal + tax;
+
+            document.getElementById('cartSubtotal').innerText = `$${subtotal.toFixed(2)} MXN`;
+            document.getElementById('cartTax').innerText = `$${tax.toFixed(2)} MXN`;
+            document.getElementById('cartTotal').innerText = `$${total.toFixed(2)} MXN`;
+        }
+
+        function toggleCartModal() {
+            document.getElementById('cartModal').classList.toggle('hidden');
+        }
+
+        function processPayPalCheckout() {
+            if (cart.length === 0) {
+                alert("Agrega al menos un artículo al carrito antes de pagar con PayPal.");
+                return;
+            }
+
+            const subtotal = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
+            const tax = subtotal * 0.16;
+            const total = subtotal + tax;
+
+            const folio = "UTN-" + Math.floor(100000 + Math.random() * 900000);
+            const paypalId = "PAYID-" + Math.random().toString(36).substring(2, 10).toUpperCase();
+            const now = new Date().toLocaleString('es-MX');
+            const activeSession = JSON.parse(localStorage.getItem('utn_active_session') || 'null');
+            const customer = activeSession ? activeSession.user : "Estudiante Invitado";
+
+            // Populate Ticket Modal
+            document.getElementById('ticketDate').innerText = now;
+            document.getElementById('ticketFolio').innerText = folio;
+            document.getElementById('ticketPayPalId').innerText = paypalId;
+            document.getElementById('ticketCustomer').innerText = customer;
+
+            document.getElementById('ticketItemsList').innerHTML = cart.map(i => `
+                <div class="flex justify-between">
+                    <span>${i.qty}x ${i.name}</span>
+                    <span>$${(i.price * i.qty).toFixed(2)}</span>
+                </div>
+            `).join('');
+
+            document.getElementById('ticketSubtotal').innerText = `$${subtotal.toFixed(2)} MXN`;
+            document.getElementById('ticketTax').innerText = `$${tax.toFixed(2)} MXN`;
+            document.getElementById('ticketTotal').innerText = `$${total.toFixed(2)} MXN`;
+
+            // Save Order in Database
+            const orders = JSON.parse(localStorage.getItem('utn_db_orders') || '[]');
+            orders.unshift({
+                folio,
+                paypalId,
+                customer,
+                total: total.toFixed(2),
+                itemsCount: cart.reduce((s, i) => s + i.qty, 0),
+                date: now
+            });
+            localStorage.setItem('utn_db_orders', JSON.stringify(orders));
+
+            // Clear Cart & Show Ticket
+            cart = [];
+            updateCartUI();
+            toggleCartModal();
+            document.getElementById('ticketModal').classList.remove('hidden');
+            renderDatabaseMonitor();
+        }
+
+        function closeTicketModal() {
+            document.getElementById('ticketModal').classList.add('hidden');
+        }
+
+        // ==========================================
+        // 3. LOGIN, CAPTCHA & TOKEN LOGIC
+        // ==========================================
+        function generateCaptcha() {
+            const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+            let code = "";
+            for (let i = 0; i < 6; i++) {
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            currentCaptcha = code;
+            document.getElementById('captchaDisplay').innerText = code;
+        }
+
+        function openLoginModal() {
+            generateCaptcha();
+            document.getElementById('loginStep1Form').classList.remove('hidden');
+            document.getElementById('loginStep2Form').classList.add('hidden');
+            document.getElementById('loginModal').classList.remove('hidden');
+        }
+
+        function closeLoginModal() {
+            document.getElementById('loginModal').classList.add('hidden');
+        }
+
+        function handleLoginStep1(e) {
+            e.preventDefault();
+            const userInputCaptcha = document.getElementById('captchaInput').value.trim().toUpperCase();
+            if (userInputCaptcha !== currentCaptcha) {
+                alert("Código CAPTCHA incorrecto. Intenta nuevamente.");
+                generateCaptcha();
+                document.getElementById('captchaInput').value = "";
+                return;
+            }
+
+            pendingLoginUser = document.getElementById('loginUser').value.trim();
+            generatedSecurityToken = Math.floor(100000 + Math.random() * 900000).toString();
+
+            document.getElementById('generatedTokenBox').innerText = generatedSecurityToken;
+            document.getElementById('loginStep1Form').classList.add('hidden');
+            document.getElementById('loginStep2Form').classList.remove('hidden');
+        }
+
+        function handleLoginStep2(e) {
+            e.preventDefault();
+            const tokenEntered = document.getElementById('tokenInput').value.trim();
+            if (tokenEntered !== generatedSecurityToken) {
+                alert("El Token ingresado no coincide.");
+                return;
+            }
+
+            const jwtSimulated = "TKN-UTN-" + generatedSecurityToken + "-" + Math.random().toString(36).substring(2, 6).toUpperCase();
+            const sessionData = {
+                user: pendingLoginUser,
+                token: jwtSimulated,
+                date: new Date().toLocaleString('es-MX')
+            };
+
+            localStorage.setItem('utn_active_session', JSON.stringify(sessionData));
+
+            const logins = JSON.parse(localStorage.getItem('utn_db_logins') || '[]');
+            logins.unshift(sessionData);
+            localStorage.setItem('utn_db_logins', JSON.stringify(logins));
+
+            updateSessionUI();
+            renderDatabaseMonitor();
+            closeLoginModal();
+            document.getElementById('loginStep1Form').reset();
+            document.getElementById('loginStep2Form').reset();
+        }
+
+        function updateSessionUI() {
+            const active = JSON.parse(localStorage.getItem('utn_active_session') || 'null');
+            const banner = document.getElementById('sessionBanner');
+            const btnText = document.getElementById('authButtonText');
+
+            if (active) {
+                banner.classList.remove('hidden');
+                document.getElementById('activeUserDisplay').innerText = active.user;
+                document.getElementById('activeTokenDisplay').innerText = active.token;
+                btnText.innerText = active.user.split('@')[0];
+            } else {
+                banner.classList.add('hidden');
+                btnText.innerText = "Iniciar Sesión";
+            }
+        }
+
+        function logoutUser() {
+            localStorage.removeItem('utn_active_session');
+            updateSessionUI();
+        }
+
+        // ==========================================
+        // 4. FORMULARIOS & BASE DE DATOS LOGIC
+        // ==========================================
+        function saveFormSubmission(e) {
+            e.preventDefault();
+            const record = {
+                nombre: document.getElementById('formNombre').value.trim(),
+                matricula: document.getElementById('formMatricula').value.trim(),
+                correo: document.getElementById('formCorreo').value.trim(),
+                carrera: document.getElementById('formCarrera').value,
+                mensaje: document.getElementById('formMensaje').value.trim(),
+                fecha: new Date().toLocaleString('es-MX')
+            };
+
+            const forms = JSON.parse(localStorage.getItem('utn_db_forms') || '[]');
+            forms.unshift(record);
+            localStorage.setItem('utn_db_forms', JSON.stringify(forms));
+
+            document.getElementById('orientationForm').reset();
+            renderDatabaseMonitor();
+            alert("Formulario guardado correctamente en la Base de Datos.");
+        }
+
+        function renderDatabaseMonitor() {
+            const logins = JSON.parse(localStorage.getItem('utn_db_logins') || '[]');
+            const forms = JSON.parse(localStorage.getItem('utn_db_forms') || '[]');
+            const orders = JSON.parse(localStorage.getItem('utn_db_orders') || '[]');
+
+            document.getElementById('dbCountLogins').innerText = logins.length;
+            document.getElementById('dbCountForms').innerText = forms.length;
+            document.getElementById('dbCountOrders').innerText = orders.length;
+
+            document.getElementById('dbLoginsList').innerHTML = logins.length === 0
+                ? `<p class="text-slate-400">Sin sesiones registradas.</p>`
+                : logins.map(l => `
+                    <div class="bg-white p-2.5 rounded-xl border border-slate-200">
+                        <div class="font-bold text-slate-800">${l.user}</div>
+                        <div class="font-mono text-[10px] text-emerald-700">${l.token}</div>
+                        <div class="text-[10px] text-slate-400">${l.date}</div>
+                    </div>
+                `).join('');
+
+            document.getElementById('dbFormsList').innerHTML = forms.length === 0
+                ? `<p class="text-slate-400">Sin formularios registrados.</p>`
+                : forms.map(f => `
+                    <div class="bg-white p-2.5 rounded-xl border border-slate-200">
+                        <div class="font-bold text-slate-800">${f.nombre} (${f.matricula})</div>
+                        <div class="text-[10px] text-brand-600">${f.carrera}</div>
+                        <div class="text-slate-600 mt-0.5">${f.mensaje}</div>
+                    </div>
+                `).join('');
+
+            document.getElementById('dbOrdersList').innerHTML = orders.length === 0
+                ? `<p class="text-slate-400">Sin compras registradas.</p>`
+                : orders.map(o => `
+                    <div class="bg-white p-2.5 rounded-xl border border-slate-200">
+                        <div class="flex justify-between font-bold text-slate-800">
+                            <span>${o.folio}</span>
+                            <span class="text-emerald-600">$${o.total} MXN</span>
+                        </div>
+                        <div class="text-[10px] text-blue-600 font-mono">${o.paypalId}</div>
+                        <div class="text-[10px] text-slate-500">${o.customer} • ${o.date}</div>
+                    </div>
+                `).join('');
+        }
+
+        function exportDatabaseJSON() {
+            const data = {
+                logins: JSON.parse(localStorage.getItem('utn_db_logins') || '[]'),
+                formularios: JSON.parse(localStorage.getItem('utn_db_forms') || '[]'),
+                tickets_paypal: JSON.parse(localStorage.getItem('utn_db_orders') || '[]')
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = "base_de_datos_utn.json";
+            a.click();
+        }
+
+        function clearDatabase() {
+            if (confirm("¿Deseas borrar todos los registros de la Base de Datos local?")) {
+                localStorage.removeItem('utn_db_logins');
+                localStorage.removeItem('utn_db_forms');
+                localStorage.removeItem('utn_db_orders');
+                renderDatabaseMonitor();
+            }
+        }
+
+        // ==========================================
+        // 5. WELCOME MODAL, CARRUSEL, FLYERS & CHATBOT
+        // ==========================================
         function closeWelcomeModal() {
             document.getElementById('welcomeModal').classList.add('hidden');
         }
 
-        // 2. MOBILE MENU TOGGLE
         function toggleMobileMenu() {
-            const menu = document.getElementById('mobileMenu');
-            menu.classList.toggle('hidden');
+            document.getElementById('mobileMenu').classList.toggle('hidden');
         }
 
-        // 3. CAROUSEL LOGIC
         let currentSlide = 0;
         const slides = document.querySelectorAll('.carousel-item');
 
         function showSlide(index) {
             slides.forEach((slide, i) => {
-                if (i === index) {
-                    slide.classList.remove('opacity-0');
-                    slide.classList.add('opacity-100');
-                } else {
-                    slide.classList.remove('opacity-100');
-                    slide.classList.add('opacity-0');
-                }
+                slide.classList.toggle('opacity-100', i === index);
+                slide.classList.toggle('opacity-0', i !== index);
             });
         }
 
@@ -505,9 +1181,8 @@
             showSlide(currentSlide);
         }
 
-        setInterval(nextSlide, 5000); // Auto-advance carousel
+        setInterval(nextSlide, 5000);
 
-        // 4. FLYER MODAL LOGIC
         function openFlyerModal(imgSrc, title, desc) {
             document.getElementById('modalFlyerImg').src = imgSrc;
             document.getElementById('modalFlyerTitle').innerText = title;
@@ -519,16 +1194,12 @@
             document.getElementById('flyerModal').classList.add('hidden');
         }
 
-        // 5. HUMAN CHAT LOGIC (Lic. Sofía)
         function toggleChatWindow() {
-            const chat = document.getElementById('chatWindow');
-            chat.classList.toggle('hidden');
+            document.getElementById('chatWindow').classList.toggle('hidden');
         }
 
         function handleKeyPress(e) {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
+            if (e.key === 'Enter') sendMessage();
         }
 
         function openChatWithQuestion(text) {
@@ -548,54 +1219,52 @@
             if (!message) return;
 
             const chatMessages = document.getElementById('chatMessages');
-
-            // User Message
             const userBubble = document.createElement('div');
             userBubble.className = 'flex items-end justify-end space-x-2';
-            userBubble.innerHTML = `
-                <div class="bg-brand-600 text-white rounded-2xl rounded-tr-none p-3 shadow-sm max-w-[80%]">
-                    ${message}
-                </div>
-            `;
+            userBubble.innerHTML = `<div class="bg-brand-600 text-white rounded-2xl rounded-tr-none p-3 shadow-sm max-w-[80%]"><p class="user-text"></p></div>`;
+            userBubble.querySelector('.user-text').textContent = message;
             chatMessages.appendChild(userBubble);
             input.value = '';
             chatMessages.scrollTop = chatMessages.scrollHeight;
 
-            // Simulated Response from Lic. Sofía
             setTimeout(() => {
-                let responseText = "Gracias por comunicarte. En la UTN te acompañamos con total confidencialidad. ¿Te gustaría agendar una cita de orientación?";
-                
+                let responseText = "Gracias por comunicarte. En la UTN te acompañamos con confidencialidad. También puedes registrarte en la sección de Formularios.";
                 const lower = message.toLowerCase();
-                if (lower.includes('ubicación') || lower.includes('ubicacion') || lower.includes('cubículo') || lower.includes('donde')) {
-                    responseText = "Nos encontramos en el Edificio D de Servicios Estudiantiles, planta baja. ¡Puedes pasar libremente de 8:00 a 18:00 hrs!";
+                if (lower.includes('ubicación') || lower.includes('ubicacion') || lower.includes('donde')) {
+                    responseText = "Estamos en el Edificio D de Servicios Estudiantiles, planta baja, de 8:00 a 18:00 hrs.";
+                } else if (lower.includes('paypal') || lower.includes('tienda') || lower.includes('comprar')) {
+                    responseText = "En la sección Catálogo puedes agregar productos al carrito, pagar con PayPal y descargar tu Ticket oficial.";
                 } else if (lower.includes('confidencial')) {
-                    responseText = "Absolutamente. Toda orientación brindada por el equipo psicopedagógico de la UTN es estrictamente confidencial y respetuosa.";
+                    responseText = "Toda orientación psicológica y los registros del portal están protegidos con total confidencialidad.";
                 }
 
                 const botBubble = document.createElement('div');
                 botBubble.className = 'flex items-start space-x-2';
                 botBubble.innerHTML = `
                     <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&q=80" class="w-7 h-7 rounded-full object-cover mt-1">
-                    <div class="bg-white border border-slate-200 rounded-2xl rounded-tl-none p-3 shadow-sm text-slate-700 max-w-[80%]">
-                        ${responseText}
-                    </div>
+                    <div class="bg-white border border-slate-200 rounded-2xl rounded-tl-none p-3 shadow-sm text-slate-700 max-w-[80%]">${responseText}</div>
                 `;
                 chatMessages.appendChild(botBubble);
                 chatMessages.scrollTop = chatMessages.scrollHeight;
-            }, 800);
+            }, 700);
         }
 
-        // 6. INITIALIZE LEAFLET MAP AT UTN
+        // ==========================================
+        // 6. INITIALIZATION ON LOAD
+        // ==========================================
         window.onload = function() {
-            // UTN Coordinates: 19.4002, -98.9959
-            const map = L.map('utnMap').setView([19.4002, -98.9959], 16);
+            renderCatalog();
+            updateCartUI();
+            updateSessionUI();
+            renderDatabaseMonitor();
 
+            const map = L.map('utnMap').setView([19.4002, -98.9959], 16);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; OpenStreetMap contributors'
             }).addTo(map);
 
             L.marker([19.4002, -98.9959]).addTo(map)
-                .bindPopup('<b>UTN - Universidad Tecnológica de Nezahualcóyotl</b><br>Servicios Estudiantiles y Orientación.')
+                .bindPopup('<b>UTN - Universidad Tecnológica de Nezahualcóyotl</b><br>Servicios Estudiantiles, Orientación y Tienda Oficial.')
                 .openPopup();
         };
     </script>
